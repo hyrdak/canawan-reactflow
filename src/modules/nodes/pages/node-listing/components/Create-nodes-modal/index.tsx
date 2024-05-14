@@ -48,6 +48,8 @@ const ModalCreateNode: React.FC = () => {
         fetchData();
     }, []);
     console.log("hello");
+    console.log("hee");
+
 
     const handleChangeEType = (value: string) => {
         dataElementType.map((item) => {

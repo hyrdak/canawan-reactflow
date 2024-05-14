@@ -47,7 +47,7 @@ const ModalCreateNode: React.FC = () => {
         };
         fetchData();
     }, []);
-    console.log("hello");
+    console.log("hello world!");
     console.log("hee");
 
 

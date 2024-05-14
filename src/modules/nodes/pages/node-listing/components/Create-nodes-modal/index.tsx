@@ -47,8 +47,7 @@ const ModalCreateNode: React.FC = () => {
         };
         fetchData();
     }, []);
-    console.log(dataKind);
-    
+
     const handleChangeEType = (value: string) => {
         dataElementType.map((item) => {
             if (value === item.name_elementType) {
@@ -81,9 +80,9 @@ const ModalCreateNode: React.FC = () => {
             return false;
         }
     };
-    
-  
-    
+
+
+
     const Add_Node = async () => {
         console.log(JSON.stringify(form.getFieldsValue(), null, 2));
         if (name && textAreaValue && type && kind) {
@@ -148,7 +147,7 @@ const ModalCreateNode: React.FC = () => {
                                 <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
                             ))}
                         </Select>
-                       {/* <Checkbox></Checkbox> */}
+                        {/* <Checkbox></Checkbox> */}
                     </Form.Item>
                     <label>JSON Options:</label>
                     <Form.List name="op">
@@ -220,8 +219,8 @@ const ModalCreateNode: React.FC = () => {
                                                                     const currentPropName = currentItems[field.name]?.props?.[nestedField.name]?.propName;
                                                                     console.log(prevPropName);
                                                                     console.log(currentPropName);
-                                                                    
-                                                                    
+
+
                                                                     return prevPropName !== currentPropName;
                                                                 }}
                                                             >
@@ -295,8 +294,8 @@ const ModalCreateNode: React.FC = () => {
                                             <pre>
                                                 {
                                                     JSON.stringify(form.getFieldsValue(), null, 2)
-                                                    
-                                                    
+
+
                                                 }
                                             </pre>
                                         </Typography>

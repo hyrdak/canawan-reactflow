@@ -47,7 +47,8 @@ const ModalCreateNode: React.FC = () => {
         };
         fetchData();
     }, []);
-
+    console.log(dataKind);
+    
     const handleChangeEType = (value: string) => {
         dataElementType.map((item) => {
             if (value === item.name_elementType) {

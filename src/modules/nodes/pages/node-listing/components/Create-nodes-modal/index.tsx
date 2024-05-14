@@ -48,7 +48,7 @@ const ModalCreateNode: React.FC = () => {
         fetchData();
     }, []);
     console.log("hello");
-    console.log("hee");
+    console.log("hee1");
 
 
     const handleChangeEType = (value: string) => {

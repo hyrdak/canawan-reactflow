@@ -26,6 +26,7 @@ interface DataElementType {
 interface DataProps {
     value: string;
 }
+
 interface Props {
     propName: string;
     propValue: string;
@@ -58,9 +59,6 @@ const ModalCreateNode: React.FC = () => {
         };
         fetchData();
     }, []);
-    console.log("hello world!");
-    console.log("hee");
-
 
     const handleChangeEType = (value: string) => {
         dataElementType.map((item) => {
@@ -84,18 +82,6 @@ const ModalCreateNode: React.FC = () => {
     const handleChangeKind = (value: number) => {
         setKind(value);
     };
-
-    const isJSONString = (str: string) => {
-        try {
-            JSON.parse(str);
-
-            return true;
-        } catch (error) {
-            return false;
-        }
-    };
-
-
 
     const Add_Node = async () => {
         const fieldsValue = form.getFieldsValue()
@@ -131,6 +117,7 @@ const ModalCreateNode: React.FC = () => {
             message.error('Vui lòng nhập đầy đủ thông tin!');
         }
     };
+
 
     return (
         <>

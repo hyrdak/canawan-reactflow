@@ -204,8 +204,6 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
-      } else{
-        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -219,8 +217,6 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
-      } else{
-        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -240,8 +236,6 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
-      } else{
-        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -257,6 +251,24 @@ const databaseService = {
         .from('Kind')
         .delete()
         .eq('id', id);
+      if (error) {
+        console.error('Error:', error.message);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+
+  //edit kind
+  async editKind(id:any, value:string) {
+    try {
+        const { data, error } = await supabase
+        .from('Kind')
+        .update({ name_kind : value })
+        .eq("id", id)
+        .select()
       if (error) {
         console.error('Error:', error.message);
       }

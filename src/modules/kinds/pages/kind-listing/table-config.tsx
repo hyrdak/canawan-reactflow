@@ -10,7 +10,6 @@ import ModalEditKind from './components/Edit-kinds-modal';
 interface GetTableColumnsConfigProps {}
 
 async function handleDelete(id: any) {
-    console.log(id);
     if(await databaseService.deleteKind(id)) {
         message.success('Xóa thành công!');
         localStorage.setItem("flag_load", 'true');
@@ -42,7 +41,7 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
           width: 101,
           render: (text: string, record: any) => (
             <span>
-              <ModalEditKind name_kind={record.name_kind} />
+              <ModalEditKind val={record} />
               <Popconfirm
                 title="Are you sure to delete this type?"
                 onConfirm={() => handleDelete(record.id)}

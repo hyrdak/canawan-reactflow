@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { CloseOutlined, MinusCircleOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Card, Checkbox, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
-import Paragraph from 'antd/es/skeleton/Paragraph';
-import { FormInstance } from 'antd/lib/form';
+import { CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Card, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
 
 import databaseService from '../../../../../../databaseService';
 
@@ -45,10 +43,6 @@ const ModalCreateNode: React.FC = () => {
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [dataKind, setDataKind] = useState<DataKind[]>([]);
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
-    const [name, setName] = useState<string>("");
-    const [type, setType] = useState<number>(0);
-    const [kind, setKind] = useState<number>(0);
-    const [textAreaValue, setTextAreaValue] = useState<string>("");
     const [options, setOptions] = useState<DataProps[]>([]);
 
     useEffect(() => {
@@ -71,23 +65,14 @@ const ModalCreateNode: React.FC = () => {
         });
     };
 
-    const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    };
-
-    const handleChangeType = (value: number) => {
-        setType(value);
-    };
-
-    const handleChangeKind = (value: number) => {
-        setKind(value);
-    };
-
     const Add_Node = async () => {
         const fieldsValue = form.getFieldsValue()
-        if (name && fieldsValue.op && type && kind) {
-            if (fieldsValue.op && Array.isArray(fieldsValue.op)) {
-                const updatedJson = fieldsValue.op.map((field: Field) => {
+        const changeName = form.getFieldValue('name')
+        const changeType = form.getFieldValue('type')
+        const changeKind = form.getFieldValue('kind')
+        if (changeName && fieldsValue.props && changeType && changeKind) {
+            if (fieldsValue.props && Array.isArray(fieldsValue.props)) {
+                const updatedJson = fieldsValue.props.map((field: Field) => {
                     const newProps: { [key: string]: string } = {};
                     field.props.forEach((prop: Props) => {
                         newProps[prop.propName] = prop.propValue;
@@ -99,9 +84,8 @@ const ModalCreateNode: React.FC = () => {
                     };;
                 })
                 if (updatedJson) {
-
                     console.log("Updated JSON:", updatedJson);
-                    if (await databaseService.addNode(name, kind, type, updatedJson)) {
+                    if (await databaseService.addNode(changeName, changeKind, changeType, updatedJson)) {
                         localStorage.setItem("flag_load", 'true');
                         message.success('Thêm thành công!');
                         window.location.href = '/nodes';
@@ -138,36 +122,61 @@ const ModalCreateNode: React.FC = () => {
                     style={{ maxWidth: 600 }}
                     autoComplete="off"
                     onFinish={Add_Node}
+                    initialValues={{ remember: true }}
                 >
                     <Form.Item
                         label="Name"
                         name="name"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please enter a name"
+                            },
+                            {
+                                whitespace: true,
+                                min: 4
+                            }
+                        ]}
+                        hasFeedback
                     >
-                        <Input onChange={handleChangeName} value={name} />
+                        <Input />
                     </Form.Item>
                     <Form.Item
                         label="Type"
                         name="type"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please enter a Type"
+                            }
+                        ]}
+                        hasFeedback
                     >
-                        <Select onChange={handleChangeType}>
+                        <Select >
                             {dataType.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_type}</Select.Option>
                             ))}
                         </Select>
                     </Form.Item>
+
                     <Form.Item
                         label="Kind"
                         name="kind"
                     >
-                        <Select onChange={handleChangeKind}>
+                        <Select>
                             {dataKind.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
                             ))}
                         </Select>
                         {/* <Checkbox></Checkbox> */}
                     </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit">
+                            Submit
+                        </Button>
+                    </Form.Item>
                     <label>JSON Options:</label>
-                    <Form.List name="op">
+                    <Form.List name="props">
                         {(fields, { add, remove }) => (
                             <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                                 {fields.map((field) => (
@@ -234,9 +243,6 @@ const ModalCreateNode: React.FC = () => {
                                                                     const currentItems = currentValues.items || [];
                                                                     const prevPropName = prevItems[field.name]?.props?.[nestedField.name]?.propName;
                                                                     const currentPropName = currentItems[field.name]?.props?.[nestedField.name]?.propName;
-                                                                    console.log(prevPropName);
-                                                                    console.log(currentPropName);
-
 
                                                                     return prevPropName !== currentPropName;
                                                                 }}
@@ -283,7 +289,9 @@ const ModalCreateNode: React.FC = () => {
                                                                             name={[nestedField.name, 'propValue']}
                                                                             fieldKey={[nestedField.key, 'propValue']}
                                                                             rules={[{ required: true, message: 'Please input the prop value!' }]}
+
                                                                         >
+
                                                                             <Input placeholder="Prop Value" />
                                                                         </Form.Item>
                                                                     );

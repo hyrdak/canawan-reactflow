@@ -26,6 +26,17 @@ interface DataElementType {
 interface DataProps {
     value: string;
 }
+interface Props {
+    propName: string;
+    propValue: string;
+}
+
+interface Field {
+    name: string;
+    label: string;
+    elementType: string;
+    props: Props[];
+}
 
 const ModalCreateNode: React.FC = () => {
     const [form] = Form.useForm();
@@ -87,18 +98,34 @@ const ModalCreateNode: React.FC = () => {
 
 
     const Add_Node = async () => {
-        console.log(JSON.stringify(form.getFieldsValue(), null, 2));
-        if (name && textAreaValue && type && kind) {
-            if (isJSONString(textAreaValue)) {
-                if (await databaseService.addNode(name, kind, type, JSON.parse(textAreaValue))) {
-                    localStorage.setItem("flag_load", 'true');
-                    message.success('Thêm thành công!');
-                    window.location.href = '/nodes';
+        const fieldsValue = form.getFieldsValue()
+        if (name && fieldsValue.op && type && kind) {
+            if (fieldsValue.op && Array.isArray(fieldsValue.op)) {
+                const updatedJson = fieldsValue.op.map((field: Field) => {
+                    const newProps: { [key: string]: string } = {};
+                    field.props.forEach((prop: Props) => {
+                        newProps[prop.propName] = prop.propValue;
+                    });
+
+                    return {
+                        ...field,
+                        props: newProps
+                    };;
+                })
+                if (updatedJson) {
+
+                    console.log("Updated JSON:", updatedJson);
+                    if (await databaseService.addNode(name, kind, type, updatedJson)) {
+                        localStorage.setItem("flag_load", 'true');
+                        message.success('Thêm thành công!');
+                        window.location.href = '/nodes';
+                    }
                 } else {
-                    message.error('Thêm thất bại!');
+                    message.error('Vui lòng nhập đúng định dạng json!');
                 }
-            } else {
-                message.error('Vui lòng nhập đúng định dạng json!');
+            }
+            else {
+                message.error('Thêm thất bại!');
             }
         } else {
             message.error('Vui lòng nhập đầy đủ thông tin!');
@@ -283,6 +310,19 @@ const ModalCreateNode: React.FC = () => {
                                                             Add Prop
                                                         </Button>
                                                     </Form.Item>
+                                                    <Form.Item noStyle shouldUpdate>
+                                                        {() => (
+                                                            <Typography>
+                                                                <pre>
+                                                                    {
+                                                                        JSON.stringify(form.getFieldsValue(), null, 2)
+
+
+                                                                    }
+                                                                </pre>
+                                                            </Typography>
+                                                        )}
+                                                    </Form.Item>
                                                 </>
                                             )}
                                         </Form.List>
@@ -291,19 +331,7 @@ const ModalCreateNode: React.FC = () => {
                                 <Button type="dashed" onClick={() => add()} block>
                                     + Add Option
                                 </Button>
-                                <Form.Item noStyle shouldUpdate>
-                                    {() => (
-                                        <Typography>
-                                            <pre>
-                                                {
-                                                    JSON.stringify(form.getFieldsValue(), null, 2)
 
-
-                                                }
-                                            </pre>
-                                        </Typography>
-                                    )}
-                                </Form.Item>
                             </div>
                         )}
                     </Form.List>

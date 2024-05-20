@@ -170,11 +170,6 @@ const ModalCreateNode: React.FC = () => {
                         </Select>
                         {/* <Checkbox></Checkbox> */}
                     </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
                     <label>JSON Options:</label>
                     <Form.List name="props">
                         {(fields, { add, remove }) => (
@@ -304,19 +299,6 @@ const ModalCreateNode: React.FC = () => {
                                                         <Button type="dashed" onClick={() => addNested()} block icon={<PlusOutlined />}>
                                                             Add Prop
                                                         </Button>
-                                                    </Form.Item>
-                                                    <Form.Item noStyle shouldUpdate>
-                                                        {() => (
-                                                            <Typography>
-                                                                <pre>
-                                                                    {
-                                                                        JSON.stringify(form.getFieldsValue(), null, 2)
-
-
-                                                                    }
-                                                                </pre>
-                                                            </Typography>
-                                                        )}
                                                     </Form.Item>
                                                 </>
                                             )}

@@ -19,6 +19,7 @@ const KindListingRoot = () => {
 
     const handleGetData = async () => {
         setData(await databaseService.getKind());
+        console.log(localStorage.getItem('NodesList'));
         const listLocalStore = localStorage.getItem('listReactFlowInstance');
         try {
             if (listLocalStore && Array.isArray(JSON.parse(listLocalStore))) {

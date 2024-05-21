@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Card, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
+import { CloseOutlined, MinusCircleOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Card, Checkbox, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
+import Paragraph from 'antd/es/skeleton/Paragraph';
+import { FormInstance } from 'antd/lib/form';
 
 import databaseService from '../../../../../../databaseService';
 
@@ -25,27 +27,17 @@ interface DataProps {
     value: string;
 }
 
-interface Props {
-    propName: string;
-    propValue: string;
-}
-
-interface Field {
-    name: string;
-    label: string;
-    elementType: string;
-    props: Props[];
-}
-
 const ModalCreateNode: React.FC = () => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [dataKind, setDataKind] = useState<DataKind[]>([]);
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
+    const [name, setName] = useState<string>("");
+    const [type, setType] = useState<number>(0);
+    const [kind, setKind] = useState<number>(0);
+    const [textAreaValue, setTextAreaValue] = useState<string>("");
     const [options, setOptions] = useState<DataProps[]>([]);
-    const [checked, setChecked] = useState<DataProps[]>([]);
-    const [checkedProps, setCheckedProps] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,57 +55,52 @@ const ModalCreateNode: React.FC = () => {
                 item.props.map((itemprops: any) => {
                     setOptions(prevOptions => [...prevOptions, { value: itemprops.name }]);
                 })
-                const newChecked = item.props.map((itemprops: any) => ({ value: itemprops.checked }));
-                setChecked(newChecked);
-                setCheckedProps(item.props);
             }
         });
     };
 
-    const handleAddProp = () => {
-        const newProp = { propName: '', propValue: '' };
-        form.setFieldsValue({
-            props: [newProp]
-        });
+    const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
     };
 
+    const handleChangeType = (value: number) => {
+        setType(value);
+    };
+
+    const handleChangeKind = (value: number) => {
+        setKind(value);
+    };
+
+    const isJSONString = (str: string) => {
+        try {
+            JSON.parse(str);
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+    
+  
+    
     const Add_Node = async () => {
-        const fieldsValue = form.getFieldsValue()
-        const changeName = form.getFieldValue('name')
-        const changeType = form.getFieldValue('type')
-        const changeKind = form.getFieldValue('kind')
-        if (changeName && fieldsValue.props && changeType && changeKind) {
-            if (fieldsValue.props && Array.isArray(fieldsValue.props)) {
-                const updatedJson = fieldsValue.props.map((field: Field) => {
-                    const newProps: { [key: string]: string } = {};
-                    field.props.forEach((prop: Props) => {
-                        newProps[prop.propName] = prop.propValue;
-                    });
-
-                    return {
-                        ...field,
-                        props: newProps
-                    };;
-                })
-                if (updatedJson) {
-                    console.log("Updated JSON:", updatedJson);
-                    if (await databaseService.addNode(changeName, changeKind, changeType, updatedJson)) {
-                        localStorage.setItem("flag_load", 'true');
-                        message.success('Thêm thành công!');
-                        window.location.href = '/nodes';
-                    }
+        console.log(JSON.stringify(form.getFieldsValue(), null, 2));
+        if (name && textAreaValue && type && kind) {
+            if (isJSONString(textAreaValue)) {
+                if (await databaseService.addNode(name, kind, type, JSON.parse(textAreaValue))) {
+                    localStorage.setItem("flag_load", 'true');
+                    message.success('Thêm thành công!');
+                    window.location.href = '/nodes';
                 } else {
-                    message.error('Vui lòng nhập đúng định dạng json!');
+                    message.error('Thêm thất bại!');
                 }
-            }
-            else {
-                message.error('Thêm thất bại!');
+            } else {
+                message.error('Vui lòng nhập đúng định dạng json!');
             }
         } else {
             message.error('Vui lòng nhập đầy đủ thông tin!');
         }
     };
-
 
     return (
         <>
@@ -134,57 +121,36 @@ const ModalCreateNode: React.FC = () => {
                     style={{ maxWidth: 600 }}
                     autoComplete="off"
                     onFinish={Add_Node}
-                    initialValues={{ remember: true }}
                 >
                     <Form.Item
                         label="Name"
                         name="name"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please enter a name"
-                            },
-                            {
-                                whitespace: true,
-                                min: 2
-                            }
-                        ]}
-                        hasFeedback
                     >
-                        <Input />
+                        <Input onChange={handleChangeName} value={name} />
                     </Form.Item>
                     <Form.Item
                         label="Type"
                         name="type"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please enter a Type"
-                            }
-                        ]}
-                        hasFeedback
                     >
-                        <Select >
+                        <Select onChange={handleChangeType}>
                             {dataType.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_type}</Select.Option>
                             ))}
                         </Select>
                     </Form.Item>
-
                     <Form.Item
                         label="Kind"
                         name="kind"
                     >
-                        <Select>
+                        <Select onChange={handleChangeKind}>
                             {dataKind.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
                             ))}
                         </Select>
-                        {/* <Checkbox></Checkbox> */}
+                       {/* <Checkbox></Checkbox> */}
                     </Form.Item>
-
                     <label>JSON Options:</label>
-                    <Form.List name="option">
+                    <Form.List name="op">
                         {(fields, { add, remove }) => (
                             <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                                 {fields.map((field) => (
@@ -225,21 +191,12 @@ const ModalCreateNode: React.FC = () => {
                                         </Form.Item>
                                         <label>Props:</label>
                                         <Form.List name={[field.name, 'props']}>
-                                            {(nestedFields, { add: handleAddProp, remove: removeNested }) => (
+                                            {(nestedFields, { add: addNested, remove: removeNested }) => (
                                                 <>
-                                                    {checkedProps &&
-                                                        checkedProps.map((prop: any, index: number) => {
-                                                            if (prop.checked === 'true') {
-                                                                return (
-                                                                    <Form.Item key={index} label={prop.name} name={[index, 'propValue']}>
-                                                                        <Input />
-                                                                    </Form.Item>
-                                                                );
-                                                            }
-                                                        })}
                                                     {nestedFields.map((nestedField) => (
                                                         <Space key={nestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
                                                             <Form.Item
+                                                                {...nestedField}
                                                                 name={[nestedField.name, 'propName']}
                                                                 fieldKey={[nestedField.key, 'propName']}
                                                                 rules={[{ required: true, message: 'Please input the prop name!' }]}
@@ -260,7 +217,10 @@ const ModalCreateNode: React.FC = () => {
                                                                     const currentItems = currentValues.items || [];
                                                                     const prevPropName = prevItems[field.name]?.props?.[nestedField.name]?.propName;
                                                                     const currentPropName = currentItems[field.name]?.props?.[nestedField.name]?.propName;
-
+                                                                    console.log(prevPropName);
+                                                                    console.log(currentPropName);
+                                                                    
+                                                                    
                                                                     return prevPropName !== currentPropName;
                                                                 }}
                                                             >
@@ -289,7 +249,6 @@ const ModalCreateNode: React.FC = () => {
                                                                                             >
                                                                                                 <Input placeholder="Value" />
                                                                                             </Form.Item>
-
                                                                                             <MinusCircleOutlined onClick={() => removeDeepNested(deepNestedField.name)} />
                                                                                         </Space>
                                                                                     ))}
@@ -307,9 +266,7 @@ const ModalCreateNode: React.FC = () => {
                                                                             name={[nestedField.name, 'propValue']}
                                                                             fieldKey={[nestedField.key, 'propValue']}
                                                                             rules={[{ required: true, message: 'Please input the prop value!' }]}
-
                                                                         >
-
                                                                             <Input placeholder="Prop Value" />
                                                                         </Form.Item>
                                                                     );
@@ -319,22 +276,9 @@ const ModalCreateNode: React.FC = () => {
                                                         </Space>
                                                     ))}
                                                     <Form.Item>
-                                                        <Button type="dashed" onClick={() => handleAddProp()} block icon={<PlusOutlined />}>
+                                                        <Button type="dashed" onClick={() => addNested()} block icon={<PlusOutlined />}>
                                                             Add Prop
                                                         </Button>
-                                                    </Form.Item>
-                                                    <Form.Item noStyle shouldUpdate>
-                                                        {() => (
-                                                            <Typography>
-                                                                <pre>
-                                                                    {
-                                                                        JSON.stringify(form.getFieldsValue(), null, 2)
-
-
-                                                                    }
-                                                                </pre>
-                                                            </Typography>
-                                                        )}
                                                     </Form.Item>
                                                 </>
                                             )}
@@ -344,7 +288,19 @@ const ModalCreateNode: React.FC = () => {
                                 <Button type="dashed" onClick={() => add()} block>
                                     + Add Option
                                 </Button>
-
+                                <Form.Item noStyle shouldUpdate>
+                                    {() => (
+                                        <Typography>
+                                            <pre>
+                                                {
+                                                    JSON.stringify(form.getFieldsValue(), null, 2)
+                                                    
+                                                    
+                                                }
+                                            </pre>
+                                        </Typography>
+                                    )}
+                                </Form.Item>
                             </div>
                         )}
                     </Form.List>

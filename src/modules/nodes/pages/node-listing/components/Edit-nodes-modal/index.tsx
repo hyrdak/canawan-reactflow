@@ -1,132 +1,81 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect,useState } from 'react';
+import ReactJson from 'react-json-view';
 
-import { CloseOutlined, EditOutlined, MinusCircleOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Card, Checkbox, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
-import Paragraph from 'antd/es/skeleton/Paragraph';
-import { FormInstance } from 'antd/lib/form';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, message,Modal, Select } from 'antd';
+import { useForm } from 'antd/es/form/Form';
 
 import databaseService from '../../../../../../databaseService';
 
-interface DataType {
-    id: number;
-    name_type: string;
-}
 
-interface DataKind {
-    id: number;
-    name_kind: string;
-}
 
-interface DataElementType {
-    id: number;
-    props: any;
-    name_elementType: string;
-}
 
-interface DataProps {
-    value: string;
-}
-
-interface Props {
-    propName: string;
-    propValue: string;
-}
-
-interface Field {
-    name: string;
-    label: string;
-    elementType: string;
-    props: Props[];
-}
-
-export default function ModalEditNode(e: any) {
-    const dataJSON = e.json;
-    const [form] = Form.useForm();
+export default function ModalEditNode(e:any) {
+    const [form] = useForm();
     const [open, setOpen] = useState(false);
-    const [dataType, setDataType] = useState<DataType[]>([]);
-    const [dataKind, setDataKind] = useState<DataKind[]>([]);
-    const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
-    const [name, setName] = useState<string>("");
-    const [type, setType] = useState<number>(0);
-    const [kind, setKind] = useState<number>(0);
-    const [textAreaValue, setTextAreaValue] = useState<string>("");
-    const [options, setOptions] = useState<DataProps[]>([]);
+
+    const [dataType, setDataType] = useState<Array<any>>([]);
+    const [dataKind, setDataKind] = useState<Array<any>>([]);
+    const [data, setData] = useState<Array<any>>([]);
+    const [textAreaValue, setTextAreaValue] = useState<any>();
+    const [name, setName] = useState<any>();
+    const [type, setType] = useState(0);
+    const [kind, setKind] = useState(0);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchDataType = async () => {
             setDataType(await databaseService.getType());
-            setDataKind(await databaseService.getKind());
-            setDataElementType(await databaseService.getElementType());
         };
-        fetchData();
+        const fetchDataKind = async () => {
+            setDataKind(await databaseService.getKind());
+        };
+        fetchDataType();
+        fetchDataKind();
     }, []);
 
-    const handleChangeEType = (value: string) => {
-        dataElementType.map((item) => {
-            if (value === item.name_elementType) {
-                setOptions([]);
-                item.props.map((itemprops: any) => {
-                    setOptions(prevOptions => [...prevOptions, { value: itemprops.name }]);
-                })
-            }
-        });
-    };
-
-    const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    };
-
+    const handleChangeName = (value: React.ChangeEvent<HTMLInputElement>) => {
+        setName(value.target.value);
+    }
     const handleChangeType = (value: number) => {
         setType(value);
-    };
-
+    }
     const handleChangeKind = (value: number) => {
         setKind(value);
-    };
+    }
+    const handleChangeOptions = (value: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setTextAreaValue(value.target.value);
+    }
+
+    //check json
+    function isJSONString(str:any) {
+        try {
+            JSON.parse(str);
+            
+return true;
+        } catch (error) {
+            return false;
+        }
+    }
 
     const Add_Node = async () => {
-        const fieldsValue = form.getFieldsValue()
-        if (name && fieldsValue.op && type && kind) {
-            if (fieldsValue.op && Array.isArray(fieldsValue.op)) {
-                const updatedJson = fieldsValue.op.map((field: Field) => {
-                    const newProps: { [key: string]: string } = {};
-                    field.props.forEach((prop: Props) => {
-                        newProps[prop.propName] = prop.propValue;
-                    });
-
-                    return {
-                        ...field,
-                        props: newProps
-                    };;
-                })
-                if (updatedJson) {
-
-                    console.log("Updated JSON:", updatedJson);
-                    if (await databaseService.addNode(name, kind, type, updatedJson)) {
-                        localStorage.setItem("flag_load", 'true');
-                        message.success('Thêm thành công!');
-                        window.location.href = '/nodes';
-                    }
-                } else {
-                    message.error('Vui lòng nhập đúng định dạng json!');
+        if( name !== '' && textAreaValue !== '' && type !== 0 && kind !==0 ) {
+            if(isJSONString(textAreaValue)) {
+                if(await databaseService.addNode(name, kind, type, JSON.parse(textAreaValue))) {
+                    message.success('Thêm thành công!');
+                    window.location.href = '/nodes';
+                }else {
+                    message.error('Thêm thất bại!');
                 }
+            }else {
+                message.error('Vui lòng nhập đúng định dạng json!');
             }
-            else {
-                message.error('Thêm thất bại!');
-            }
-        } else {
+        }else {
             message.error('Vui lòng nhập đầy đủ thông tin!');
         }
-    };
-
-
-    function fetchData() {
-        e.json.name_jsonoptions.map((item:any) => {
-            item.props = Object.entries(item.props).map(([propName, propValue]) => ({
-                propName,
-                propValue: propValue
-            }));
-        });
+    }
+    
+    const fetchData = async () => {
+        console.log(e.json);
     }
 
     return (
@@ -135,206 +84,78 @@ export default function ModalEditNode(e: any) {
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
-                title={'Create new node instance'}
+                title={'Edit node instance'}
                 destroyOnClose
                 onCancel={() => setOpen(false)}
-                onOk={Add_Node}
+                onOk={() => Add_Node()}
+            
             >
-                <Form
-                    form={form}
+                <Form form={form}
+                    layout="vertical"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                     name="dynamic_form_complex"
-                    style={{ maxWidth: 600 }}
+                    style={{ maxWidth: 1200 }}
                     autoComplete="off"
-                    onFinish={Add_Node}
+                    initialValues={{ node: [{}] }}
                 >
-                    <Form.Item
-                        label="Name"
-                        name="name"
-                        
-                    >
-                        <Input 
-                            defaultValue={e.json.name}
-                            onChange={handleChangeName} 
-                            value={name} 
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        label="Type"
-                        name="type"
-                    >
-                        <Select 
-                            onChange={handleChangeType}
-                            defaultValue={e.json.name_type}
-                        >
-                            {dataType.map((item) => (
-                                <Select.Option key={item.id} value={item.id}>{item.name_type}</Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                    <Form.Item
-                        label="Kind"
-                        name="kind"
-                    >
-                        <Select 
-                            onChange={handleChangeKind}
-                            defaultValue={e.json.name_kind}
-                        >
-                            {dataKind.map((item) => (
-                                <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
-                            ))}
-                        </Select>
-                        {/* <Checkbox></Checkbox> */}
-                    </Form.Item>
-                    <label>JSON Options:</label>
-                    <Form.List name="op" initialValue={e.json.name_jsonoptions}>
+                    <Form.List name="node">
                         {(fields, { add, remove }) => (
-                            <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 {fields.map((field) => (
                                     <Card
                                         size="small"
-                                        title={`Option ${field.name + 1}`}
                                         key={field.key}
-                                        extra={
-                                            <CloseOutlined onClick={() => remove(field.name)} />
-                                        }
                                     >
-                                        <Form.Item
-                                            {...field}
-                                            name={[field.name, 'name']}
-                                            label="Name"
-                                        >
-                                            <Input />
+                                        <Form.Item label="Name">
+                                            <Input 
+                                                onChange={handleChangeName}
+                                                value={e.json.name}
+                                            />
                                         </Form.Item>
-                                        <Form.Item
-                                            {...field}
-                                            name={[field.name, 'label']}
-                                            label="Label"
-                                            rules={[{ required: true, message: 'Please input the label!' }]}
-                                        >
-                                            <Input />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...field}
-                                            name={[field.name, 'elementType']}
-                                            label="Element Type"
-                                            rules={[{ required: true, message: 'Please select the element type!' }]}
-                                        >
-                                            <Select onChange={handleChangeEType}>
-                                                {dataElementType.map((item) => (
-                                                    <Select.Option key={item.id} value={item.name_elementType}>{item.name_elementType}</Select.Option>
-                                                ))}
+                                        <Form.Item label="Type">
+                                            <Select onChange={handleChangeType} defaultValue={e.json.name_type}>
+                                                {
+                                                    dataType.map((item) =>
+                                                        <Select.Option key={item.id} value={item.id}>{item.name_type}</Select.Option>
+                                                    )
+                                                }
                                             </Select>
                                         </Form.Item>
-                                        <label>Props:</label>
-                                        <Form.List name={[field.name, 'props']}>
-                                            {(nestedFields, { add: addNested, remove: removeNested }) => (
-                                                <>
-                                                    {nestedFields.map((nestedField) => (
-                                                        <Space key={nestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                                                            <Form.Item
-                                                                {...nestedField}
-                                                                name={[nestedField.name, 'propName']}
-                                                                fieldKey={[nestedField.key, 'propName']}
-                                                                rules={[{ required: true, message: 'Please input the prop name!' }]}
-                                                            >
-                                                                <AutoComplete
-                                                                    style={{ width: 200 }}
-                                                                    options={options}
-                                                                    placeholder="Prop Name"
-                                                                    filterOption={(inputValue, option) =>
-                                                                        option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                                                                    }
-                                                                />
-                                                            </Form.Item>
-                                                            <Form.Item
-                                                                noStyle
-                                                                shouldUpdate={(prevValues, currentValues) => {
-                                                                    const prevItems = prevValues.items || [];
-                                                                    const currentItems = currentValues.items || [];
-                                                                    const prevPropName = prevItems[field.name]?.props?.[nestedField.name]?.propName;
-                                                                    const currentPropName = currentItems[field.name]?.props?.[nestedField.name]?.propName;
-                                                                    console.log(prevPropName);
-                                                                    console.log(currentPropName);
 
-
-                                                                    return prevPropName !== currentPropName;
-                                                                }}
-                                                            >
-                                                                {({ getFieldValue }) => {
-                                                                    const propName = getFieldValue(['items', field.name, 'props', nestedField.name, 'propName']);
-
-                                                                    return propName === 'options' || propName === 'Options' ? (
-                                                                        <Form.List name={[nestedField.name, 'nestedProps']}>
-                                                                            {(deepNestedFields, { add: addDeepNested, remove: removeDeepNested }) => (
-                                                                                <>
-                                                                                    {deepNestedFields.map((deepNestedField) => (
-                                                                                        <Space key={deepNestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                                                                                            <Form.Item
-                                                                                                {...deepNestedField}
-                                                                                                name={[deepNestedField.name, 'label']}
-                                                                                                fieldKey={[deepNestedField.key, 'label']}
-                                                                                                rules={[{ required: true, message: 'Please input the nested prop name!' }]}
-                                                                                            >
-                                                                                                <Input placeholder="Label" />
-                                                                                            </Form.Item>
-                                                                                            <Form.Item
-                                                                                                {...deepNestedField}
-                                                                                                name={[deepNestedField.name, 'value']}
-                                                                                                fieldKey={[deepNestedField.key, 'value']}
-                                                                                                rules={[{ required: true, message: 'Please input the nested prop value!' }]}
-                                                                                            >
-                                                                                                <Input placeholder="Value" />
-                                                                                            </Form.Item>
-                                                                                            <MinusCircleOutlined onClick={() => removeDeepNested(deepNestedField.name)} />
-                                                                                        </Space>
-                                                                                    ))}
-                                                                                    <Form.Item>
-                                                                                        <Button type="dashed" onClick={() => addDeepNested()} block icon={<PlusOutlined />}>
-                                                                                            Add Options
-                                                                                        </Button>
-                                                                                    </Form.Item>
-                                                                                </>
-                                                                            )}
-                                                                        </Form.List>
-                                                                    ) : (
-                                                                        <Form.Item
-                                                                            {...nestedField}
-                                                                            name={[nestedField.name, 'propValue']}
-                                                                            fieldKey={[nestedField.key, 'propValue']}
-                                                                            rules={[{ required: true, message: 'Please input the prop value!' }]}
-                                                                        >
-                                                                            <Input placeholder="Prop Value" />
-                                                                        </Form.Item>
-                                                                    );
-                                                                }}
-                                                            </Form.Item>
-                                                            <CloseOutlined onClick={() => removeNested(nestedField.name)} />
-                                                        </Space>
-                                                    ))}
-                                                    <Form.Item>
-                                                        <Button type="dashed" onClick={() => addNested()} block icon={<PlusOutlined />}>
-                                                            Add Prop
-                                                        </Button>
-                                                    </Form.Item>
-                                                </>
-                                            )}
-                                        </Form.List>
+                                        <Form.Item label="Kind">
+                                            <Select onChange={handleChangeKind} defaultValue={e.json.name_kind}>
+                                                {
+                                                    dataKind.map((item) =>
+                                                        <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
+                                                    )
+                                                }
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            label="JSON Options"
+                                            name="TextArea"
+                                        >
+                                            <Input.TextArea
+                                                onChange={handleChangeOptions}
+                                                defaultValue={JSON.stringify(e.json.name_jsonoptions)}
+                                                rows={12}
+                                                value='113'
+                                            />
+                                            {/* <ReactJson
+                                                src={data[0].name_jsonoptions}
+                                                collapsed={true}
+                                                name={false}
+                                                displayDataTypes={false}
+                                            /> */}
+                                        </Form.Item>
                                     </Card>
-                                ))}
-                                <Typography>
-                                    <pre>
-                                        {
-                                            JSON.stringify(dataJSON, null, 2)
-                                        }
-                                    </pre>
-                                </Typography>
-                                <Button type="dashed" onClick={() => add()} block>
-                                    + Add Option
-                                </Button>
 
+                                ))}
                             </div>
                         )}
                     </Form.List>
+
                 </Form>
             </Modal>
         </>

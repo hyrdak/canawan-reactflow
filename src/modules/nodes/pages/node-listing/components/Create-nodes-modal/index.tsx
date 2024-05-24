@@ -121,7 +121,7 @@ const ModalCreateNode: React.FC = () => {
                 <Form
                     form={form}
                     name="dynamic_form_complex"
-                    style={{ maxWidth: 800, display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px' }}
+                    style={{ maxWidth: 800, display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '20px' }}
                     autoComplete="off"
                     onFinish={Add_Node}
                     initialValues={{ remember: true }}
@@ -138,7 +138,7 @@ const ModalCreateNode: React.FC = () => {
                                 },
                                 {
                                     whitespace: true,
-                                    min: 4
+                                    min: 2
                                 }
                             ]}
                             hasFeedback
@@ -154,7 +154,6 @@ const ModalCreateNode: React.FC = () => {
                                     message: "Please enter a Type"
                                 }
                             ]}
-                            hasFeedback
                         >
                             <Select >
                                 {dataType.map((item) => (
@@ -166,6 +165,12 @@ const ModalCreateNode: React.FC = () => {
                         <Form.Item
                             label="Kind"
                             name="kind"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter a kind"
+                                }
+                            ]}
                         >
                             <Select>
                                 {dataKind.map((item) => (
@@ -196,6 +201,12 @@ const ModalCreateNode: React.FC = () => {
                                                     {...field}
                                                     name={[field.name, 'name']}
                                                     label="Name"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: "Please enter a name option"
+                                                        }
+                                                    ]}
                                                 >
                                                     <Input />
                                                 </Form.Item>
@@ -224,7 +235,16 @@ const ModalCreateNode: React.FC = () => {
                                                     checkedProps.map((prop: any, i: number) => {
                                                         if (prop.checked === 'true') {
                                                             return (
-                                                                <Form.Item key={i} label={prop.name} name={[field.name, 'propsCheck', `${prop.name}`]}>
+                                                                <Form.Item
+                                                                    key={i}
+                                                                    label={prop.name}
+                                                                    name={[field.name, 'propsCheck', `${prop.name}`]}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: "Please enter a value"
+                                                                        }
+                                                                    ]}>
                                                                     <Input />
                                                                 </Form.Item>
 

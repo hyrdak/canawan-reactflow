@@ -4,6 +4,7 @@ import { CloseOutlined, EditOutlined, MinusCircleOutlined, PlusOutlined, UserOut
 import { AutoComplete, Button, Card, Checkbox, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
 import Paragraph from 'antd/es/skeleton/Paragraph';
 import { FormInstance } from 'antd/lib/form';
+import { cloneDeep } from 'lodash';
 
 import databaseService from '../../../../../../databaseService';
 
@@ -40,7 +41,10 @@ interface Field {
 }
 
 export default function ModalEditNode(e: any) {
+    
+    
     const dataJSON = e.json;
+    const dataJSON_Log = e.jsonLog;
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
     const [dataType, setDataType] = useState<DataType[]>([]);
@@ -84,87 +88,77 @@ export default function ModalEditNode(e: any) {
         setKind(value);
     };
 
-    const Add_Node = async () => {
-        const fieldsValue = form.getFieldsValue()
-        if (name && fieldsValue.op && type && kind) {
-            if (fieldsValue.op && Array.isArray(fieldsValue.op)) {
-                const updatedJson = fieldsValue.op.map((field: Field) => {
-                    const newProps: { [key: string]: string } = {};
-                    field.props.forEach((prop: Props) => {
-                        newProps[prop.propName] = prop.propValue;
-                    });
-
-                    return {
-                        ...field,
-                        props: newProps
-                    };;
-                })
-                if (updatedJson) {
-
-                    console.log("Updated JSON:", updatedJson);
-                    if (await databaseService.addNode(name, kind, type, updatedJson)) {
-                        localStorage.setItem("flag_load", 'true');
-                        message.success('Thêm thành công!');
-                        window.location.href = '/nodes';
-                    }
-                } else {
-                    message.error('Vui lòng nhập đúng định dạng json!');
-                }
-            }
-            else {
-                message.error('Thêm thất bại!');
-            }
-        } else {
-            message.error('Vui lòng nhập đầy đủ thông tin!');
-        }
+    const Edit_Node = async () => {
+        console.log('edit');
+        console.log(e.jsonLog);
     };
 
 
     function fetchData() {
-        e.json.name_jsonoptions.map((item:any) => {
-            item.props = Object.entries(item.props).map(([propName, propValue]) => ({
-                propName,
-                propValue: propValue
-            }));
+        
+        dataJSON.name_jsonoptions.map((item: any) => {
+            // if(item.props[0] !== undefined) {
+            //     Object.keys(item.props[0]).map((key: string) => {
+            //         if(key == 'propName' || key == 'propValue') {
+            //             console.log(key);
+            //         } else {
+            //             item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+            //                 propName,
+            //                 propValue: propValue
+            //             }));
+            //         }
+            //     });
+            // } else {
+            //     item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+            //         propName,
+            //         propValue: propValue
+            //     }));
+            // }
+            if(item.props[0] === undefined) {
+                item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+                    propName,
+                    propValue: propValue
+                }));
+            }
         });
     }
 
     return (
         <>
-            <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => {setOpen(true);fetchData()}}></Button>
+            <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => { setOpen(true); fetchData() }}></Button>
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
                 title={'Create new node instance'}
                 destroyOnClose
                 onCancel={() => setOpen(false)}
-                onOk={Add_Node}
+                onOk={Edit_Node}
             >
                 <Form
                     form={form}
                     name="dynamic_form_complex"
                     style={{ maxWidth: 600 }}
                     autoComplete="off"
-                    onFinish={Add_Node}
+                    onFinish={Edit_Node}
                 >
                     <Form.Item
                         label="Name"
                         name="name"
-                        
+
                     >
-                        <Input 
-                            defaultValue={e.json.name}
-                            onChange={handleChangeName} 
-                            value={name} 
+                        <Input
+                            defaultValue={dataJSON.name}
+                            onChange={handleChangeName}
+                            value={name}
                         />
                     </Form.Item>
                     <Form.Item
                         label="Type"
                         name="type"
                     >
-                        <Select 
+                        <Select
                             onChange={handleChangeType}
-                            defaultValue={e.json.name_type}
+                            defaultValue={dataJSON.name_type}
                         >
                             {dataType.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_type}</Select.Option>
@@ -175,9 +169,9 @@ export default function ModalEditNode(e: any) {
                         label="Kind"
                         name="kind"
                     >
-                        <Select 
+                        <Select
                             onChange={handleChangeKind}
-                            defaultValue={e.json.name_kind}
+                            defaultValue={dataJSON.name_kind}
                         >
                             {dataKind.map((item) => (
                                 <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
@@ -186,7 +180,7 @@ export default function ModalEditNode(e: any) {
                         {/* <Checkbox></Checkbox> */}
                     </Form.Item>
                     <label>JSON Options:</label>
-                    <Form.List name="op" initialValue={e.json.name_jsonoptions}>
+                    <Form.List name="op" initialValue={dataJSON.name_jsonoptions}>
                         {(fields, { add, remove }) => (
                             <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                                 {fields.map((field) => (
@@ -324,7 +318,7 @@ export default function ModalEditNode(e: any) {
                                 <Typography>
                                     <pre>
                                         {
-                                            JSON.stringify(dataJSON, null, 2)
+                                            JSON.stringify(dataJSON_Log, null, 2)
                                         }
                                     </pre>
                                 </Typography>

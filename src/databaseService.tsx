@@ -17,7 +17,6 @@ const axiosInstance = axios.create({
   },
 });
 
-let getID:number = 0;
 
 const databaseService = {
 
@@ -26,7 +25,7 @@ const databaseService = {
     try {
       const response = await axiosInstance.get('/Nodes');
       
-      return response.data; 
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -62,10 +61,11 @@ const databaseService = {
       throw error;
     }
   },
-  async getWorkflows() {
+  async getWorkflows(isFetching: boolean = true) {
     try {
       const response = await axiosInstance.get('/Workflows');
-      
+      // localStorage.setItem('WorkFlows',response.data)
+
       return response.data;
     } catch (error) {
       console.error('Error:', error);
@@ -78,8 +78,6 @@ const databaseService = {
     try {
       const { data, error } = await supabase
       .rpc('getnodes');
-      getID = data.length+1;
-      localStorage.setItem("ID", getID+'');
       if (error) console.error(error)
       else return data;
     } catch (error) {
@@ -134,7 +132,7 @@ const databaseService = {
       if (error) {
         console.error('Error:', error.message);
       } else {
-        return data;
+        return true;
       }
       
     } catch (error) {
@@ -234,6 +232,42 @@ const databaseService = {
           { name_kind: name_kind },
         ])
         .select();
+      if (error) {
+        console.error('Error:', error.message);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+
+  //create workflow
+  async createWorkflow(name:any, createdAt:any, userId:any, script:any) {
+    try {
+      const { data, error } = await supabase
+      .from('Workflows')
+      .insert([
+        { name: name, createdAt: createdAt, userId: userId, script: script },
+      ])
+      .select()
+      if (error) {
+        console.error('Error:', error.message);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+
+  //delete workflow
+  async deleteWorkflow(id:any) {
+    try {
+        const { error } = await supabase
+        .from('Workflows')
+        .delete()
+        .eq('id', id);
       if (error) {
         console.error('Error:', error.message);
       }

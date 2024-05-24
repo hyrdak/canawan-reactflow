@@ -6,31 +6,33 @@ import { useForm } from 'antd/es/form/Form';
 
 import databaseService from '../../../../../../databaseService';
 
-export default function ModalCreateKind() {
+export default function ModalCreateNode() {
     const [form] = useForm();
     const [open, setOpen] = useState(false);
 
-    const [kind, setKind] = useState<any>();
+    const [type, setType] = useState<any>();
 
     const handleChangeKind = (value: React.ChangeEvent<HTMLInputElement>) => {
-        setKind(value.target.value);
+        setType(value.target.value);
     }
 
     
-    const Add_Kind = async () => {
-        if( kind !== '' ) {
-            if(await databaseService.addKind(kind)) {
+    const Add_Type = async () => {
+        if( type !== '' ) {
+            if(await databaseService.addType(type)) {
                 localStorage.setItem("flag_load", 'true');
                 message.success('Thêm thành công!');
-                setOpen(false);
+               setOpen(false);
             }else {
                 message.error('Thêm thất bại!');
             }
         }else {
-            message.error('Vui lòng nhập tên kind!');
+            message.error('Vui lòng nhập tên type!');
         }
     }
+
     
+
     return (
         <>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
@@ -39,10 +41,10 @@ export default function ModalCreateKind() {
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
-                title={'Create new kind instance'}
+                title={'Create new type instance'}
                 destroyOnClose
                 onCancel={() => setOpen(false)}
-                onOk={() => Add_Kind()}
+                onOk={() => Add_Type()}
             >
                 <Form form={form}
                     layout="vertical"
@@ -51,9 +53,9 @@ export default function ModalCreateKind() {
                     name="dynamic_form_complex"
                     style={{ maxWidth: 600 }}
                     autoComplete="off"
-                    initialValues={{ kind: [{}] }}
+                    initialValues={{ type: [{}] }}
                 >
-                    <Form.List name="kind">
+                    <Form.List name="type">
                         {(fields, { add, remove }) => (
                             <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                                 {fields.map((field) => (
@@ -61,10 +63,10 @@ export default function ModalCreateKind() {
                                         size="small"
                                         key={field.key}
                                     >
-                                        <Form.Item label="Kind">
+                                        <Form.Item label="Type">
                                             <Input 
                                                 onChange={handleChangeKind}
-                                                value={kind}
+                                                value={type}
                                             />
                                         </Form.Item>
                                     </Card>

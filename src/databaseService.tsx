@@ -202,6 +202,8 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
+      } else{
+        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -215,6 +217,8 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
+      } else{
+        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -234,6 +238,8 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
+      } else{
+        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -277,7 +283,26 @@ const databaseService = {
     
     return true;
   },
-
+  //update kind
+  async updateKind(id:string,name_kind:string) {
+    try {
+        const { data, error } = await supabase
+            .from('Kind')
+            .update({ name_kind: name_kind})
+            .eq('id',id)
+            .select()
+        if (error) {
+          console.error('Error:', error.message);
+        } else{
+          console.log(data);
+        }
+      } catch (error) {
+        console.error('Error:', (error as Error).message);
+      }
+      
+return true;
+},
+  //
   //delete kind
   async deleteKind(id:any) {
     try {
@@ -294,25 +319,6 @@ const databaseService = {
     
     return true;
   },
-
-  //edit kind
-  async editKind(id:any, value:string) {
-    try {
-        const { data, error } = await supabase
-        .from('Kind')
-        .update({ name_kind : value })
-        .eq("id", id)
-        .select()
-      if (error) {
-        console.error('Error:', error.message);
-      }
-    } catch (error) {
-      console.error('Error:', (error as Error).message);
-    }
-    
-    return true;
-  },
-
   //getElementType
   async getElementType() {
     try {
@@ -324,6 +330,62 @@ const databaseService = {
       throw error;
     }
   },
+  //add type
+  async addType(name_type:any) {
+    try {
+      const { data, error } = await supabase
+        .from('Type')
+        .insert([
+          { name_type: name_type },
+        ])
+        .select();
+      if (error) {
+        console.error('Error:', error.message);
+      } else{
+        console.log(data);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+//update type
+async  editType(id: string, newName: string) {
+  try {
+      const { data, error } = await supabase
+          .from('Type')
+          .update({ name_type: newName })
+          .eq('id', id)
+          .select();
+
+      if (error) {
+          throw error;
+      }
+      
+      return data;
+  } catch (error) {
+      console.error('Error editing type');
+      throw error;
+  }
+},
+//delete type
+async deleteType(id:any) {
+  try {
+      const { error } = await supabase
+      .from('Type')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error('Error:', error.message);
+    }
+  } catch (error) {
+    console.error('Error:', (error as Error).message);
+  }
+  
+  return true;
+},
+
 
   //user
   async sign_in(email: any, password: any) {
@@ -371,7 +433,7 @@ const databaseService = {
   },
   async sign_out() {
     
-  }
+  },
 };
 
 export default databaseService;

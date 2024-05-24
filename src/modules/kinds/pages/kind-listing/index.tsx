@@ -54,7 +54,7 @@ return (
                     <ArrowLeftOutlined /> Nodes
                 </a>
                 {/* <FilterComponent /> */}
-                <div className="flex justify-end gap-3" style={{ marginLeft: 625 }}>
+                <div className="flex justify-end gap-3" style={{ marginLeft: 645 }}>
                     <Form.Item className="w-[220px]">
                         <Input placeholder="Enter keyword" value={search} onChange={e => setSearch(e.target.value)}></Input>
                     </Form.Item>

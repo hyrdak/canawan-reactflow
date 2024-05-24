@@ -4,18 +4,20 @@ import databaseService from 'databaseService';
 import { SwapLeftOutlined } from '@ant-design/icons';
 import { Button, Table } from 'antd';
 
+import { PageHeaderProvider } from 'components/core/page-header-provider';
+
 import ModalCreateNode from './components/Create-types-modal';
 import FilterComponent from './components/filter-component';
-import  {getTableColumnsConfig}  from './table-config';
+import { getTableColumnsConfig } from './table-config';
 
 const TypeListingRoot = () => {
     const [data, setData] = useState<any[]>([]);
     const [filteredData, setFilteredData] = useState<any[]>([]);
     const [searchError, setSearchError] = useState<boolean>(false);
-    
 
 
-   
+
+
 
     const fetchData = async () => {
         try {
@@ -28,20 +30,19 @@ const TypeListingRoot = () => {
     useEffect(() => {
         fetchData();
     }, []);
-    function refresh_type(){
+    function refresh_type() {
         try {
             localStorage.setItem("flag_load", 'true');
             fetchData();
-        
+
         } catch (error) {
             console.error('Lỗi khi reset:', error);
-            
+
         }
     };
-    if(ModalCreateNode() || getTableColumnsConfig({}))
-        {
-            refresh_type();
-        }
+    if (ModalCreateNode() || getTableColumnsConfig({})) {
+        refresh_type();
+    }
     const handleSearch = (keyword: string) => {
         const filteredResults = data.filter(item =>
             item.name_type.toLowerCase().includes(keyword.toLowerCase())
@@ -54,19 +55,23 @@ const TypeListingRoot = () => {
 
     return (
         <div>
-            <ModalCreateNode />
-            <div className='mb-2'>
-                <a className=' text-black' onClick={() => window.location.href = '/nodes'} >
+            <PageHeaderProvider extra={<ModalCreateNode />} />
+            <div className='flex items-center'>
+                <a className=' text-black' onClick={() => window.location.href = '/nodes'}>
                     <SwapLeftOutlined /> Nodes
                 </a>
-            </div>              
-            <FilterComponent onSearch={handleSearch} />
-            {searchError && <div>No matching data found</div>}
+                <div className="flex justify-end gap-3" style={{ marginLeft: 645 }}>
+                    <FilterComponent onSearch={handleSearch} />
+                    {searchError && <div>No matching data found</div>}
+                </div>
+
+            </div>
             <Table dataSource={filteredData.length > 0 ? filteredData : data} columns={columns} bordered />
-           
+
+
         </div>
     );
-    
+
 };
 
 export default TypeListingRoot;

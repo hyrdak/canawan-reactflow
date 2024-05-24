@@ -25,6 +25,18 @@ interface DataProps {
     value: string;
 }
 
+interface Props {
+    propName: string;
+    propValue: string;
+}
+
+interface Field {
+    name: string;
+    label: string;
+    elementType: string;
+    props: Props[];
+}
+
 const ModalCreateNode: React.FC = () => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
@@ -79,15 +91,17 @@ const ModalCreateNode: React.FC = () => {
                         window.location.href = '/nodes';
                     }
                 } else {
-                    message.error('Thêm thất bại!');
+                    message.error('Vui lòng nhập đúng định dạng json!');
                 }
-            } else {
-                message.error('Vui lòng nhập đúng định dạng json!');
+            }
+            else {
+                message.error('Thêm thất bại!');
             }
         } else {
             message.error('Vui lòng nhập đầy đủ thông tin!');
         }
     };
+
 
     return (
         <>
@@ -154,7 +168,7 @@ const ModalCreateNode: React.FC = () => {
                                 <Select.Option key={item.id} value={item.id}>{item.name_kind}</Select.Option>
                             ))}
                         </Select>
-                       {/* <Checkbox></Checkbox> */}
+                        {/* <Checkbox></Checkbox> */}
                     </Form.Item>
                     <label>JSON Options:</label>
                     <Form.List name="props">

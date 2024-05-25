@@ -89,7 +89,8 @@ const ModalCreateNode: React.FC = () => {
                     if (await databaseService.addNode(value.name, value.kind, value.type, updatedJson)) {
                         localStorage.setItem("flag_load", 'true');
                         message.success('Thêm thành công!');
-                        window.location.href = '/nodes';
+                        setOpen(false);
+                        localStorage.setItem("flag_load", 'true');
                     }
                 } else {
                     message.error('Vui lòng nhập đúng định dạng json!');

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ReactJson from 'react-json-view';
 import databaseService from 'databaseService';
 
@@ -7,19 +8,26 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import ModalEditNode from './components/Edit-nodes-modal';
 
-function handleEdit(record: any): void {
-    console.log(record);
-    
-}
-
-async function handleDelete(id: any) {
-    if(await databaseService.deleteNodeByID(id)) {
-        message.success('Success!');
-        localStorage.setItem("flag_load", 'true');
-        setTimeout(() => {window.location.href = '/nodes';}, 1000);
+const GetTableColumnsConfig = () => {
+    const [flag, setFlag] = useState(false);
+    const [currentRecord, setCurrentRecord] = useState(-1);
+    async function handleEdit(e:any) {
+        if(e == currentRecord) {
+            await setFlag(false);
+            setFlag(true);
+            setCurrentRecord(e);
+        } else {
+            setFlag(true);
+            setCurrentRecord(e);
+        }
     }
-}
-export const getTableColumnsConfig = () => {
+    async function handleDelete(id: any) {
+        if(await databaseService.deleteNodeByID(id)) {
+            message.success('Xóa thành công!');
+        }
+    }
+
+    //row
     const columnConfig: any[] = [
         {
             title: '#',
@@ -74,8 +82,15 @@ export const getTableColumnsConfig = () => {
           width: 180,
           render: (text: string, record: any) => (
             <span>
-                {/* <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => {}}></Button> */}
-              <ModalEditNode json={cloneDeep(record)} jsonLog={cloneDeep(record)} />
+                <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={()=>{handleEdit(record.id)}}></Button>
+              {/* <ModalEditNode json={cloneDeep(record)} jsonLog={cloneDeep(record)} /> */}
+                {(flag && currentRecord==record.id)?(
+                    <>
+                    <ModalEditNode
+                        json={cloneDeep(record)}
+                        jsonLog={cloneDeep(record)}
+                    /></>
+                ):''}
               <Popconfirm
                 title="Are you sure to delete this type?"
                 onConfirm={() => handleDelete(record.id)}
@@ -84,6 +99,7 @@ export const getTableColumnsConfig = () => {
               >
                 <Button type="primary" danger icon={<DeleteOutlined />}></Button>
               </Popconfirm>
+              {/* Modal */}
             </span>
           ),
         },
@@ -91,3 +107,8 @@ export const getTableColumnsConfig = () => {
 
     return columnConfig;
 };
+export default GetTableColumnsConfig;
+
+
+
+

@@ -29,21 +29,7 @@ const KindListingRoot = () => {
             item.name_kind.toLowerCase().includes(search.toLowerCase())
         );
     }, [search, data]);
-    function refresh_kind(){
-        try {
-            localStorage.setItem("flag_load", 'true');
-            handleGetData();
-        
-        } catch (error) {
-            console.error('Lỗi khi reset:', error);
-            
-        }
-    };
-    if(ModalCreateKind() || getTableColumnsConfig({}))
-        {
-            refresh_kind();
-        }
-   
+
     const columns = getTableColumnsConfig({});
     
 return (

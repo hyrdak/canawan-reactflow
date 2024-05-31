@@ -79,6 +79,7 @@ const PrivateLayout = ({ children,supabase,users }: Props) => {
         }
       };
     //
+    
     return (
         <ValidateScreen>
             <Layout>

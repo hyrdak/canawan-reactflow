@@ -28,20 +28,7 @@ const TypeListingRoot = () => {
     useEffect(() => {
         fetchData();
     }, []);
-    function refresh_type(){
-        try {
-            localStorage.setItem("flag_load", 'true');
-            fetchData();
-        
-        } catch (error) {
-            console.error('Lỗi khi reset:', error);
-            
-        }
-    };
-    if(ModalCreateNode() || getTableColumnsConfig({}))
-        {
-            refresh_type();
-        }
+    
     const handleSearch = (keyword: string) => {
         const filteredResults = data.filter(item =>
             item.name_type.toLowerCase().includes(keyword.toLowerCase())

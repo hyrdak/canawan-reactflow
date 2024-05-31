@@ -2,29 +2,30 @@ import ReactJson from 'react-json-view';
 import databaseService from 'databaseService';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Popconfirm } from 'antd';
+import { Button, message, Popconfirm } from 'antd';
+import cloneDeep from 'lodash/cloneDeep';
 
 import ModalEditNode from './components/Edit-nodes-modal';
 
-
-interface GetTableColumnsConfigProps {}
 function handleEdit(record: any): void {
     console.log(record);
     
 }
 
-function handleDelete(id: any) {
-    databaseService.deleteNodeByID(id);
-    localStorage.setItem('flag_load', 'true');
-    window.location.href = '/nodes'
+async function handleDelete(id: any) {
+    if(await databaseService.deleteNodeByID(id)) {
+        message.success('Success!');
+        localStorage.setItem("flag_load", 'true');
+        setTimeout(() => {window.location.href = '/nodes';}, 1000);
+    }
 }
-export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
+export const getTableColumnsConfig = () => {
     const columnConfig: any[] = [
         {
             title: '#',
             key: 'id',
             dataIndex: 'id',
-            width: 50,
+            width: 10,
             align: 'center',
             render: (_id: string, _record: any, index: number) => <span className="capitalize">{index + 1}</span>
         },
@@ -32,7 +33,7 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
             title: 'Name',
             key: 'name',
             dataIndex: 'name',
-            width: 200
+            width: 150
         },
         {
             title: 'Type',
@@ -70,10 +71,11 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
         {
           title: 'Actions',
           key: 'actions',
-          width: 101,
+          width: 180,
           render: (text: string, record: any) => (
             <span>
-              <ModalEditNode json={record} />
+                {/* <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => {}}></Button> */}
+              <ModalEditNode json={cloneDeep(record)} jsonLog={cloneDeep(record)} />
               <Popconfirm
                 title="Are you sure to delete this type?"
                 onConfirm={() => handleDelete(record.id)}

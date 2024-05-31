@@ -7,11 +7,11 @@ import { Button, Form, Input, Table } from 'antd';
 
 import { PageHeaderProvider } from 'components/core/page-header-provider';
 
-import ModalCreateKind from './components/Create-kinds-modal';
+import ModalCreateNode from './components/Create-types-modal';
 // import FilterComponent from './components/filter-component';
 import { getTableColumnsConfig } from './table-config';
 
-const KindListingRoot = () => {
+const TypeListingRoot = () => {
     const [data, setData] = useState<Array<any>>([]);
     const [search, setSearch] = useState('');
     const [query, setQuery] = useState('');
@@ -21,11 +21,11 @@ const KindListingRoot = () => {
         try {
             let result;
             if (searchParam) {
-                const url = `/kinds?search=${searchParam}`;
+                const url = `/types?search=${searchParam}`;
                 const response = await axios.get(url);
                 result = response.data;
             } else {
-                result = await databaseService.getKind();
+                result = await databaseService.getType();
             }
             setData(result);
         } catch (error) {
@@ -33,7 +33,7 @@ const KindListingRoot = () => {
         }
     };
 
-    const refresh_kind = () => {
+    const refresh_type = () => {
         try {
             localStorage.setItem("flag_load", 'true');
             fetchData();
@@ -42,8 +42,8 @@ const KindListingRoot = () => {
         }
     }
 
-    if(ModalCreateKind() || getTableColumnsConfig({})) {
-        refresh_kind();
+    if(ModalCreateNode() || getTableColumnsConfig({})) {
+        refresh_type();
     }
 
     useEffect(() => {
@@ -83,13 +83,12 @@ const KindListingRoot = () => {
 
     const handleSearch = async () => {
         setQuery(search);
-        const url = `/kinds?search=${search}`;
+        const url = `/types?search=${search}`;
         console.log(`Sending request to: ${url}`);
         try {
             // Thay đổi URL trong trình duyệt mà không làm tải lại trang
             window.history.pushState({}, '', url);
-
-            // Tiếp tục xử lý yêu cầu API như bình thường
+// Tiếp tục xử lý yêu cầu API như bình thường
             const response = await axios.get(url);
             setData(response.data);
         } catch (error) {
@@ -99,7 +98,7 @@ const KindListingRoot = () => {
 
     const filteredData = useMemo(() => {
         return data.filter(item =>
-            item.name_kind.toLowerCase().includes(query.toLowerCase())
+            item.name_type.toLowerCase().includes(query.toLowerCase())
         );
     }, [query, data]);
 
@@ -120,7 +119,7 @@ const KindListingRoot = () => {
 
     return (
         <div>
-            <PageHeaderProvider extra={<ModalCreateKind />} />
+            <PageHeaderProvider extra={<ModalCreateNode />} />
             <div className='flex items-center'>
                 <a className='text-black' onClick={() => window.location.href = '/nodes'}>
                     <ArrowLeftOutlined /> Nodes
@@ -151,4 +150,4 @@ const KindListingRoot = () => {
     );
 };
 
-export default KindListingRoot;
+export default TypeListingRoot;

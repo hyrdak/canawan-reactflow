@@ -4,7 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 
-interface Props {}
+interface Props { }
 
 const FilterComponent = (props: Props) => {
     const [form] = useForm();
@@ -14,7 +14,7 @@ const FilterComponent = (props: Props) => {
 
     return (
         <div>
-            <Form form={form} onFinish={handleFinish}>
+            <Form form={form} onFinish={handleFinish} style={{ marginLeft: 630 }}>
                 <div className="flex justify-end gap-3">
                     <Form.Item className="w-[220px]">
                         <Input placeholder="Enter keyword"></Input>

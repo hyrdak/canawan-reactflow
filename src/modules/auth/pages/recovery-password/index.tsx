@@ -1,8 +1,9 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { toast,ToastContainer } from 'react-toastify';
+
+import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Props {
     supabase: SupabaseClient;
@@ -30,7 +31,8 @@ const RecoveryPassword: React.FC<Props> = ({ supabase,user }) => {
             });
             if (error) {
                 toast.error('Lỗi khi cập nhật thông tin người dùng:');
-                return;
+                
+return;
             }
             toast.success('Thông tin người dùng đã được cập nhật thành công!');
             window.location.href="/login";

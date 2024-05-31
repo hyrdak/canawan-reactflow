@@ -17,7 +17,6 @@ const axiosInstance = axios.create({
   },
 });
 
-let getID:number = 0;
 
 const databaseService = {
 
@@ -26,7 +25,7 @@ const databaseService = {
     try {
       const response = await axiosInstance.get('/Nodes');
       
-      return response.data; 
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -62,10 +61,11 @@ const databaseService = {
       throw error;
     }
   },
-  async getWorkflows() {
+  async getWorkflows(isFetching: boolean = true) {
     try {
       const response = await axiosInstance.get('/Workflows');
-      
+      // localStorage.setItem('WorkFlows',response.data)
+
       return response.data;
     } catch (error) {
       console.error('Error:', error);
@@ -78,8 +78,6 @@ const databaseService = {
     try {
       const { data, error } = await supabase
       .rpc('getnodes');
-      getID = data.length+1;
-      localStorage.setItem("ID", getID+'');
       if (error) console.error(error)
       else return data;
     } catch (error) {
@@ -134,7 +132,7 @@ const databaseService = {
       if (error) {
         console.error('Error:', error.message);
       } else {
-        return data;
+        return true;
       }
       
     } catch (error) {
@@ -204,6 +202,8 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
+      } else{
+        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -217,6 +217,8 @@ const databaseService = {
         .select();
       if (error) {
         console.error('Error:', error.message);
+      } else{
+        console.log(data);
       }
     } catch (error) {
       console.error('Error:', (error as Error).message);
@@ -228,12 +230,36 @@ const databaseService = {
   //add kind
   async addKind(name_kind:any) {
     try {
+      const response = await fetch('https://ismbrwqkcootieaguzwa.supabase.co/rest/v1/Kind', {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseAPIKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify([{ name_kind: name_kind }]),
+      });
+      if (response.ok) {
+        console.log('Success')
+        
+return true;
+      } else {
+        console.error('Error:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    
+  },
+  //create workflow
+  async createWorkflow(name:any, createdAt:any, userId:any, script:any) {
+    try {
       const { data, error } = await supabase
-        .from('Kind')
-        .insert([
-          { name_kind: name_kind },
-        ])
-        .select();
+      .from('Workflows')
+      .insert([
+        { name: name, createdAt: createdAt, userId: userId, script: script },
+      ])
+      .select()
       if (error) {
         console.error('Error:', error.message);
       }
@@ -244,6 +270,42 @@ const databaseService = {
     return true;
   },
 
+  //delete workflow
+  async deleteWorkflow(id:any) {
+    try {
+        const { error } = await supabase
+        .from('Workflows')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        console.error('Error:', error.message);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+  //update kind
+  async updateKind(id:string,name_kind:string) {
+    try {
+        const { data, error } = await supabase
+            .from('Kind')
+            .update({ name_kind: name_kind})
+            .eq('id',id)
+            .select()
+        if (error) {
+          console.error('Error:', error.message);
+        } else{
+          console.log(data);
+        }
+      } catch (error) {
+        console.error('Error:', (error as Error).message);
+      }
+      
+return true;
+},
+  //
   //delete kind
   async deleteKind(id:any) {
     try {
@@ -260,25 +322,6 @@ const databaseService = {
     
     return true;
   },
-
-  //edit kind
-  async editKind(id:any, value:string) {
-    try {
-        const { data, error } = await supabase
-        .from('Kind')
-        .update({ name_kind : value })
-        .eq("id", id)
-        .select()
-      if (error) {
-        console.error('Error:', error.message);
-      }
-    } catch (error) {
-      console.error('Error:', (error as Error).message);
-    }
-    
-    return true;
-  },
-
   //getElementType
   async getElementType() {
     try {
@@ -290,6 +333,62 @@ const databaseService = {
       throw error;
     }
   },
+  //add type
+  async addType(name_type:any) {
+    try {
+      const { data, error } = await supabase
+        .from('Type')
+        .insert([
+          { name_type: name_type },
+        ])
+        .select();
+      if (error) {
+        console.error('Error:', error.message);
+      } else{
+        console.log(data);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+    }
+    
+    return true;
+  },
+//update type
+async  editType(id: string, newName: string) {
+  try {
+      const { data, error } = await supabase
+          .from('Type')
+          .update({ name_type: newName })
+          .eq('id', id)
+          .select();
+
+      if (error) {
+          throw error;
+      }
+      
+      return data;
+  } catch (error) {
+      console.error('Error editing type');
+      throw error;
+  }
+},
+//delete type
+async deleteType(id:any) {
+  try {
+      const { error } = await supabase
+      .from('Type')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error('Error:', error.message);
+    }
+  } catch (error) {
+    console.error('Error:', (error as Error).message);
+  }
+  
+  return true;
+},
+
 
   //user
   async sign_in(email: any, password: any) {
@@ -337,7 +436,7 @@ const databaseService = {
   },
   async sign_out() {
     
-  }
+  },
 };
 
 export default databaseService;

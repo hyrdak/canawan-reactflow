@@ -43,7 +43,7 @@ const NodeListingRoot = () => {
         localStorage.setItem('listReactFlowInstance', JSON.stringify(newListDnd));
     };
 
-    const columns = getTableColumnsConfig({});
+    const columns = getTableColumnsConfig();
     
     return (
         <div style={{}}>

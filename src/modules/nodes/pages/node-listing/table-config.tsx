@@ -4,13 +4,14 @@ import databaseService from 'databaseService';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Popconfirm } from 'antd';
 
+import ModalCreateNode from './components/Create-nodes-modal';
 import ModalEditNode from './components/Edit-nodes-modal';
 
 
-interface GetTableColumnsConfigProps {}
+interface GetTableColumnsConfigProps { }
 function handleEdit(record: any): void {
     console.log(record);
-    
+
 }
 
 function handleDelete(id: any) {
@@ -68,22 +69,22 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
             }
         },
         {
-          title: 'Actions',
-          key: 'actions',
-          width: 101,
-          render: (text: string, record: any) => (
-            <span>
-              <ModalEditNode json={record} />
-              <Popconfirm
-                title="Are you sure to delete this type?"
-                onConfirm={() => handleDelete(record.id)}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button type="primary" danger icon={<DeleteOutlined />}></Button>
-              </Popconfirm>
-            </span>
-          ),
+            title: 'Actions',
+            key: 'actions',
+            width: 101,
+            render: (text: string, record: any) => (
+                <span>
+                    <ModalCreateNode record={record} />
+                    <Popconfirm
+                        title="Are you sure to delete this type?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="primary" danger icon={<DeleteOutlined />}></Button>
+                    </Popconfirm>
+                </span>
+            ),
         },
     ];
 

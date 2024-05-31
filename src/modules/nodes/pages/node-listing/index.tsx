@@ -14,7 +14,6 @@ import ModalCreateNode from './components/Create-nodes-modal';
 import { getTableColumnsConfig } from './table-config';
 
 const NodeListingRoot = () => {
-    const [listDnd, setListDnd] = useState<any>([]);
     const [data, setData] = useState<Array<any>>();
 
     const getListNodes = async () => {
@@ -27,53 +26,41 @@ const NodeListingRoot = () => {
         getListNodes();
     }
 
-    const handleCreated = (data: any) => {
-        const newListDnd = [...listDnd, data];
-        setListDnd(newListDnd);
-        localStorage.setItem('listReactFlowInstance', JSON.stringify(newListDnd));
-    };
-
     useEffect(() => {
         getListNodes();
     }, []);
 
-    const handleRemove = (item: any) => {
-        const newListDnd = listDnd.filter((i: any) => i.id !== item.id);
-        setListDnd(newListDnd);
-        localStorage.setItem('listReactFlowInstance', JSON.stringify(newListDnd));
-    };
-
     const columns = getTableColumnsConfig({});
-    
+
     return (
         <div style={{}}>
             {/* <PageHeaderProvider extra={<ModalCreateReactFlow listDnd={listDnd} onCreated={handleCreated} />} /> */}
-            <PageHeaderProvider extra={<ModalCreateNode />} />
+            <PageHeaderProvider extra={<ModalCreateNode record={undefined} />} />
             <Button
                 type="primary"
                 icon={<EditFilled />}
                 onClick={() => window.location.href = '/types'}
                 className='ml-auto'
-                >Type
+            >Type
             </Button>
             <Button
                 type="primary"
                 icon={<EditFilled />}
                 onClick={() => window.location.href = '/kinds'}
                 className='ml-2 mb-2'
-                >Kind
+            >Kind
             </Button>
             {
-                data !== null? (
+                data !== null ? (
                     <Table dataSource={data} columns={columns} bordered />
-                ):''
+                ) : ''
             }
             <center>
                 <Button
                     icon={<ReloadOutlined />}
                     onClick={() => refresh_nodes()}
                     className='text-center mb-5'
-                    >Refresh
+                >Refresh
                 </Button>
             </center>
         </div>

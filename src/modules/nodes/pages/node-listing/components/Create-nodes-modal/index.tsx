@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, EditOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Card, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
 
 import databaseService from '../../../../../../databaseService';
@@ -9,7 +9,6 @@ interface DataType {
     id: number;
     name_type: string;
 }
-interface po { }
 interface DataKind {
     id: number;
     name_kind: string;
@@ -37,8 +36,11 @@ interface Field {
     props: Props[];
     propsCheck: object;
 }
+interface ModalEditNodeProps {
+    record: any;
+}
 
-const ModalCreateNode: React.FC = () => {
+const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
     const [dataType, setDataType] = useState<DataType[]>([]);
@@ -56,65 +58,85 @@ const ModalCreateNode: React.FC = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        if (record) {
+            form.setFieldsValue({
+                name: record.name,
+                type: record.name_type,
+                kind: record.name_kind,
+                jsons: record.name_jsonoptions,
+            });
+        }
+    }, [record, form]);
+
+    // const handleChangeEType = (value: string) => {
+    //     dataElementType.map((item) => {
+    //         if (value === item.name_elementType) {
+    //             setOptions([]);
+    //             item.props.map((itemprops: any) => {
+    //                 setOptions(prevOptions => [...prevOptions, { value: itemprops.name }]);
+    //             })
+    //             setCheckedProps(item.props);
+    //         }
+    //     });
+    // };
     const handleChangeEType = (value: string) => {
-        dataElementType.map((item) => {
+        dataElementType.forEach((item) => {
             if (value === item.name_elementType) {
-                setOptions([]);
-                item.props.map((itemprops: any) => {
-                    setOptions(prevOptions => [...prevOptions, { value: itemprops.name }]);
-                })
+                const newOptions = item.props.map((itemprops: any) => ({ value: itemprops.name }));
+                setOptions(newOptions);
                 setCheckedProps(item.props);
             }
         });
     };
 
     const Add_Node = async (value: any) => {
-        if (value.name && value.jsons && value.type && value.kind) {
-            if (value.jsons && Array.isArray(value.jsons)) {
-                const updatedJson = value.jsons.map((field: Field) => {
-                    const newProps: { [key: string]: string } = {};
-                    field.props.forEach((prop: Props) => {
-                        newProps[prop.propName] = prop.propValue;
-                    });
-                    const combinedProps = { ...field.propsCheck, ...newProps }
-                    const { propsCheck, ...restOfField } = field;
-
-                    return {
-                        ...restOfField,
-                        props: combinedProps
-                    };
-                })
-                if (updatedJson) {
-                    console.log("Updated JSON:", updatedJson);
-                    if (await databaseService.addNode(value.name, value.kind, value.type, updatedJson)) {
-                        localStorage.setItem("flag_load", 'true');
-                        message.success('Thêm thành công!');
-                        setOpen(false);
-                        localStorage.setItem("flag_load", 'true');
-                    }
-                } else {
-                    message.error('Vui lòng nhập đúng định dạng json!');
-                }
+        const updatedJson = value.jsons.map((field: Field) => {
+            const newProps: { [key: string]: string } = {};
+            if (Array.isArray(field.props)) {
+                field.props.forEach((prop: Props) => {
+                    newProps[prop.propName] = prop.propValue;
+                });
             }
-            else {
-                message.error('Thêm thất bại!');
+            const combinedProps = { ...field.propsCheck, ...newProps }
+            const { propsCheck, ...restOfField
+            } = field;
+
+            return {
+                ...restOfField,
+                props: combinedProps
+            };
+
+        }); if (record) {
+            // Update node
+            const success = await databaseService.updateNode(value.name, value.kind, value.type, updatedJson);
+            if (success) {
+                message.success('Node updated successfully!');
+                setOpen(false);
+            } else {
+                message.error('Failed to update node!');
             }
         } else {
-            message.error('Vui lòng nhập đầy đủ thông tin!');
+            // Add new node
+            const success = await databaseService.addNode(value.name, value.kind, value.type, updatedJson);
+            if (success) {
+                message.success('Node added successfully!');
+                setOpen(false);
+            } else {
+                message.error('Failed to add node!');
+            }
         }
     };
 
 
     return (
         <>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
-                Create
+            <Button type="primary" icon={record ? <EditOutlined /> : <PlusOutlined />} onClick={() => setOpen(true)}>
+                {record ? '' : 'Create'}
             </Button>
             <Modal
                 open={open}
-                afterClose={() => form.resetFields()}
                 title={'Create new node instance'}
-                destroyOnClose
                 onCancel={() => setOpen(false)}
                 onOk={() => form.submit()}
                 style={{ minWidth: '80%', maxWidth: '90%' }}

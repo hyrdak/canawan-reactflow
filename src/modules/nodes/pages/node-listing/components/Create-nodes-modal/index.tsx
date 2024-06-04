@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { QUERY_KEYS } from 'constants-es';
 
 import { CloseOutlined, EditOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { AutoComplete, Button, Card, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
 
 import databaseService from '../../../../../../databaseService';
@@ -49,6 +51,8 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [options, setOptions] = useState<DataProps[]>([]);
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
 
+    const queryClient = useQueryClient();
+
     useEffect(() => {
         const fetchData = async () => {
             setDataType(await databaseService.getType());
@@ -65,9 +69,15 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                 type: record.name_type,
                 kind: record.name_kind,
                 jsons: record.name_jsonoptions,
+                props: record.name_jsonoptions.props
+
             });
         }
+
     }, [record, form]);
+
+
+
 
     // const handleChangeEType = (value: string) => {
     //     dataElementType.map((item) => {
@@ -80,6 +90,21 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     //         }
     //     });
     // };
+
+    const afterClose = () => {
+        if (!record) {
+            form.resetFields();
+        }
+        else {
+            form.setFieldsValue({
+                name: record.name,
+                type: record.name_type,
+                kind: record.name_kind,
+                jsons: record.name_jsonoptions,
+            });
+        }
+    };
+
     const handleChangeEType = (value: string) => {
         dataElementType.forEach((item) => {
             if (value === item.name_elementType) {
@@ -91,6 +116,28 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     };
 
     const Add_Node = async (value: any) => {
+
+        if (record.name_type == value.type) {
+            const selectedType = dataType.find((type) => type.name_type === value.type);
+            if (!selectedType) {
+                message.error('Invalid type!');
+
+                return;
+            }
+            value.type = selectedType.id;
+        }
+
+        if (record.name_kind == value.kind) {
+            const selectedKind = dataKind.find((kind) => kind.name_kind === value.kind);
+            if (!selectedKind) {
+                message.error('Invalid kind!');
+
+                return;
+            }
+            value.kind = selectedKind.id;
+        }
+
+
         const updatedJson = value.jsons.map((field: Field) => {
             const newProps: { [key: string]: string } = {};
             if (Array.isArray(field.props)) {
@@ -98,35 +145,38 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                     newProps[prop.propName] = prop.propValue;
                 });
             }
-            const combinedProps = { ...field.propsCheck, ...newProps }
-            const { propsCheck, ...restOfField
-            } = field;
+            const propsCheck = field.propsCheck || {};
+            const combinedProps = { ...propsCheck, ...newProps };
+            const { propsCheck: ignored, ...restOfField } = field;
 
             return {
                 ...restOfField,
-                props: combinedProps
+                props: combinedProps,
             };
-
-        }); if (record) {
-            // Update node
+        });
+        debugger
+        if (record) {
             const success = await databaseService.updateNode(value.name, value.kind, value.type, updatedJson);
             if (success) {
-                message.success('Node updated successfully!');
+                message.success('Updated Node Succes!');
                 setOpen(false);
+                queryClient.invalidateQueries({
+                    queryKey: [QUERY_KEYS.NODES]
+                });
             } else {
-                message.error('Failed to update node!');
+                message.error('Updated Node Failed!');
             }
         } else {
-            // Add new node
             const success = await databaseService.addNode(value.name, value.kind, value.type, updatedJson);
             if (success) {
-                message.success('Node added successfully!');
+                message.success('Create Node Succes!');
                 setOpen(false);
             } else {
-                message.error('Failed to add node!');
+                message.error('Create Node Failed!');
             }
         }
     };
+
 
 
     return (
@@ -136,10 +186,12 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             </Button>
             <Modal
                 open={open}
-                title={'Create new node instance'}
+                title={record ? 'Edit node instance' : 'Create new node instance'}
                 onCancel={() => setOpen(false)}
                 onOk={() => form.submit()}
                 style={{ minWidth: '80%', maxWidth: '90%' }}
+                afterClose={afterClose}
+                destroyOnClose
             >
                 <Form
                     form={form}
@@ -277,8 +329,36 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                 <Form.List name={[field.name, 'props']}>
                                                     {(nestedFields, { add: addNested, remove: removeNested }) => (
                                                         <>
+                                                            {nestedFields.map((nestedField) => (record ? (
+                                                                <Form style={{ display: 'flex', marginBottom: 30 }}>
+                                                                    <Form.Item
+                                                                        name={[nestedField.name, 'propName']}
+                                                                        rules={[{ required: true, message: 'Please input the prop value!' }]}
+                                                                    >
+                                                                        <AutoComplete
+                                                                            style={{ width: 200 }}
+                                                                            options={options}
+                                                                            placeholder="Prop Name"
+                                                                            filterOption={(inputValue, option) =>
+                                                                                option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                                            }
+                                                                        />
+                                                                    </Form.Item>
+                                                                    <Form.Item
+                                                                        name={[nestedField.name, 'propValue']}
+                                                                        rules={[{ required: true, message: 'Please input the prop name!' }]}
+                                                                    >
+                                                                        <Input placeholder="Basic usage" />
+                                                                    </Form.Item>
+
+                                                                </Form>
+                                                            ) : (
+                                                                <p>No data available</p>
+                                                            )))}
+
                                                             {nestedFields.map((nestedField) => (
                                                                 <Space key={nestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+
                                                                     <Form.Item
                                                                         {...nestedField}
                                                                         name={[nestedField.name, 'propName']}

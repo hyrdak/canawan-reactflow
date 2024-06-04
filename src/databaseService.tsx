@@ -196,34 +196,22 @@ const databaseService = {
   //add Node
   async addNode(name: any, id_kind: any, id_type: any, json_option: any) {
     try {
-      const { data, error } = await supabase
-        .from('Nodes')
-        .insert([
-          { name: name, id_kind: id_kind, id_type: id_type },
-        ])
-        .select();
-      if (error) {
-        console.error('Error:', error.message);
-      } else {
-        console.log(data);
-      }
+      const response = await axiosInstance.post('Nodes', {
+        name: name, id_kind: id_kind, id_type: id_type
+      });
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
+
+      return false;
     }
     try {
-      const { data, error } = await supabase
-        .from('JsonOptions')
-        .insert([
-          { name_jsonoptions: json_option },
-        ])
-        .select();
-      if (error) {
-        console.error('Error:', error.message);
-      } else {
-        console.log(data);
-      }
+      const response = await axiosInstance.post('JsonOptions', {
+        name_jsonoptions: json_option
+      });
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
+
+      return false;
     }
 
     return true;
@@ -231,39 +219,22 @@ const databaseService = {
 
   updateNode: async (name: any, id_kind: any, id_type: any, json_option: any) => {
     try {
-
-      const { data, error } = await supabase
-        .from('Nodes')
-        .update({
-          name: 'name',
-        })
-        .eq('name', name)
-        .eq('id_kind', id_kind)
-        .eq('id_type', id_type)
-        .select()
-      if (error) {
-        console.error('Error:', error.message);
-      } else {
-        console.log(data);
-      }
+      const response = await axiosInstance.put('Nodes', {
+        name: name, id_kind: id_kind, id_type: id_type
+      });
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
+
+      return false;
     }
     try {
-      const { data, error } = await supabase
-        .from('JsonOptions')
-        .update({
-          name_jsonoptions: json_option
-        })
-        .eq(json_option, json_option)
-        .select()
-      if (error) {
-        console.error('Error:', error.message);
-      } else {
-        console.log(data);
-      }
+      const response = await axiosInstance.put('JsonOptions', {
+        json_option: json_option
+      });
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
+
+      return false;
     }
 
     return true;

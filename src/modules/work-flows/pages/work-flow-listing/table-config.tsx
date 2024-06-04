@@ -40,7 +40,7 @@ export const getTableColumnsConfig = ({ isSmallScreen }: GetTableColumnsConfigPr
                 async function handleDelete(id: any) {
                     if(await databaseService.deleteWorkflow(id)) {
                         message.success('Success!');
-                        
+                        setTimeout(() => {window.location.href = '/work-flows';}, 1000)
                     }
                 }
 

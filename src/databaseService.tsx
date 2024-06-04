@@ -225,7 +225,7 @@ const databaseService = {
   //delete workflow
   async deleteWorkflow(id:any) {
     try {
-      const response = await axiosInstance.delete('Workflows?id=eq.'+id);
+      const response = await axiosInstance.post('Workflows?id=eq.'+id);
       if (response) {
         
         return response;
@@ -241,7 +241,7 @@ const databaseService = {
   //update kind
   async updateKind(id:string,name_kind:string) {
     try {
-      const response = await axiosInstance.patch('Kind?id=eq.'+id,{name_kind: name_kind});
+      const response = await axiosInstance.post('Kind?id=eq.'+id,{name_kind: name_kind});
       if (response) {
         
         return response;
@@ -258,7 +258,7 @@ const databaseService = {
   //delete kind
   async deleteKind(id:any) {
     try {
-      const response = await axiosInstance.delete('Kind?id=eq.'+id);
+      const response = await axiosInstance.post('Kind?id=eq.'+id);
       if (response) {
         
         return response;
@@ -304,7 +304,7 @@ const databaseService = {
 //update type name_type: newName
 async  editType(id: string, newName: string) {
   try {
-    const response = await axiosInstance.patch('Type?id=eq.'+id,{name_type: newName});
+    const response = await axiosInstance.post('Type?id=eq.'+id,{name_type: newName});
     if (response) {
       
       return response;
@@ -318,7 +318,7 @@ async  editType(id: string, newName: string) {
 //delete type
 async deleteType(id:any) {
   try {
-    const response = await axiosInstance.delete('Type?id=eq.'+id);
+    const response = await axiosInstance.post('Type?id=eq.'+id);
     if (response) {
       
       return response;

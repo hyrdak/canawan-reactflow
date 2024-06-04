@@ -22,6 +22,11 @@ interface DataElementType {
     name_elementType: string;
 }
 
+interface DataJson {
+    id: number;
+    name_jsonoptions: any;
+}
+
 interface DataProps {
     value: string;
 }
@@ -50,6 +55,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
     const [options, setOptions] = useState<DataProps[]>([]);
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
+    const [dataJson, setDataJson] = useState<DataJson[]>([]);
 
     const queryClient = useQueryClient();
 
@@ -58,6 +64,8 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             setDataType(await databaseService.getType());
             setDataKind(await databaseService.getKind());
             setDataElementType(await databaseService.getElementType());
+            setDataJson(await databaseService.getJsonOptions());
+
         };
         fetchData();
     }, []);
@@ -69,15 +77,16 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                 type: record.name_type,
                 kind: record.name_kind,
                 jsons: record.name_jsonoptions,
-                props: record.name_jsonoptions.props
-
             });
         }
 
     }, [record, form]);
-
-
-
+    // useEffect(() => {
+    //     if (open && record) {
+    //         const currentElementType = record.name_jsonoptions[0]?.elementType; // Assuming you're using the first json option's elementType to determine the props
+    //         handleChangeEType(currentElementType);
+    //     }
+    // }, [open, record]);
 
     // const handleChangeEType = (value: string) => {
     //     dataElementType.map((item) => {
@@ -115,28 +124,31 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
         });
     };
 
-    const Add_Node = async (value: any) => {
+    const HandleEditCreateNodes = async (value: any) => {
 
-        if (record.name_type == value.type) {
-            const selectedType = dataType.find((type) => type.name_type === value.type);
-            if (!selectedType) {
-                message.error('Invalid type!');
+        if (record) {
+            if (record.name_type == value.type) {
+                const selectedType = dataType.find((type) => type.name_type === value.type);
+                if (!selectedType) {
+                    message.error('Invalid type!');
 
-                return;
+                    return;
+
+                }
+                value.type = selectedType.id;
             }
-            value.type = selectedType.id;
-        }
+            const selectedJson = record.name_jsonoptions
+            console.log(selectedJson);
+            if (record.name_kind == value.kind) {
+                const selectedKind = dataKind.find((kind) => kind.name_kind === value.kind);
+                if (!selectedKind) {
+                    message.error('Invalid kind!');
 
-        if (record.name_kind == value.kind) {
-            const selectedKind = dataKind.find((kind) => kind.name_kind === value.kind);
-            if (!selectedKind) {
-                message.error('Invalid kind!');
-
-                return;
+                    return;
+                }
+                value.kind = selectedKind.id;
             }
-            value.kind = selectedKind.id;
         }
-
 
         const updatedJson = value.jsons.map((field: Field) => {
             const newProps: { [key: string]: string } = {};
@@ -156,7 +168,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
         });
         debugger
         if (record) {
-            const success = await databaseService.updateNode(value.name, value.kind, value.type, updatedJson);
+            const success = await databaseService.updateNode(record.id, value.name, value.kind, value.type, updatedJson);
             if (success) {
                 message.success('Updated Node Succes!');
                 setOpen(false);
@@ -198,7 +210,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                     name="dynamic_form_complex"
                     style={{ maxWidth: 800, display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '20px' }}
                     autoComplete="off"
-                    onFinish={Add_Node}
+                    onFinish={HandleEditCreateNodes}
                     initialValues={{ remember: true }}
                     layout='vertical'
                 >
@@ -326,6 +338,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                             );
                                                         }
                                                     })}
+
                                                 <Form.List name={[field.name, 'props']}>
                                                     {(nestedFields, { add: addNested, remove: removeNested }) => (
                                                         <>

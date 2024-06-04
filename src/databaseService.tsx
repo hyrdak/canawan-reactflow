@@ -1,12 +1,7 @@
 import axios from 'axios';
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://ismbrwqkcootieaguzwa.supabase.co';
 const supabaseAPIUrl = 'https://ismbrwqkcootieaguzwa.supabase.co/rest/v1/';
 const supabaseAPIKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzbWJyd3FrY29vdGllYWd1endhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NTQyNDcsImV4cCI6MjAyODEzMDI0N30.fEo-ddluC6l2HNPqIjcHBFHTYdIWoE8vjfjIX9KPbPI';
-
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
 
 const axiosInstance = axios.create({
   baseURL: supabaseAPIUrl,
@@ -17,14 +12,13 @@ const axiosInstance = axios.create({
   },
 });
 
-let getID: number = 0;
-
 const databaseService = {
 
   //table
   async getNodes() {
     try {
-      const response = await axiosInstance.get('/Nodes');
+      console.log("Khởi chạy getNodes");
+      const response = await axiosInstance.get('Nodes');
 
       return response.data;
     } catch (error) {
@@ -34,6 +28,7 @@ const databaseService = {
   },
   async getType() {
     try {
+      console.log("Khởi chạy getType");
       const response = await axiosInstance.get('/Type');
 
       return response.data;
@@ -44,6 +39,7 @@ const databaseService = {
   },
   async getKind() {
     try {
+      console.log("Khởi chạy getKind");
       const response = await axiosInstance.get('/Kind');
 
       return response.data;
@@ -54,6 +50,7 @@ const databaseService = {
   },
   async getJsonOptions() {
     try {
+      console.log("Khởi chạy getJsonOptions");
       const response = await axiosInstance.get('/JsonOptions');
 
       return response.data;
@@ -64,6 +61,7 @@ const databaseService = {
   },
   async getWorkflows() {
     try {
+      console.log("Khởi chạy getWorkflows");
       const response = await axiosInstance.get('/Workflows');
 
       return response.data;
@@ -74,122 +72,95 @@ const databaseService = {
   },
 
   //Nodes
-  async getNodesList() {
+  async getDataNodeList() {
     try {
-      const { data, error } = await supabase
-        .rpc('getnodes');
-      getID = data.length + 1;
-      localStorage.setItem("ID", getID + '');
-      if (error) console.error(error)
-      else return data;
+      const response = await axiosInstance.post('rpc/getnodes');
+      if (response) {
+
+        return response.data;
+      } else {
+        console.error('Error:', response);
+      }
     } catch (error) {
       console.error('Error:', error);
-    }
-  },
-  //----------------------------------------
-  async getDataNodeList() {
-    const flag_load = localStorage.getItem('flag_load');
-    if (flag_load === 'true') {
-      localStorage.setItem("flag_load", 'false');
-      const nodes = await this.getNodesList();
-      const json = JSON.stringify(nodes);
-      localStorage.setItem("NodesList", json);
-
-      return nodes;
-    } else {
-      const nodes = localStorage.getItem("NodesList");
-      if (nodes !== null) {
-        const json = JSON.parse(nodes);
-
-        return json;
-      }
     }
   },
 
   //getNodeByID
   async getNodeByID(id: any) {
     try {
-      const { data, error } = await supabase
-        .rpc('getnodesbyid', {
-          e: id
-        })
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('rpc/getnodesbyid', { id: id });
+      console.log(response)
+
+      if (response) {
+
+        return response.data;
       } else {
-        return data;
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
   },
 
   //deleteNodeByID
   async deleteNodeByID(id: any) {
     try {
-      const { data, error } = await supabase
-        .rpc('deletenodesbyid', {
-          e: id
-        });
-      this.deleteJsonOptionsByID(id);
-      if (error) {
-        console.error('Error:', error.message);
-      } else {
-        return data;
-      }
+      const response = await axiosInstance.post('rpc/deletenodesbyid', { e: id });
+      console.log(this.deleteJsonOptionsByID(id));
+      if (response) {
 
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
   },
 
   //deleteNodeByID
   async deleteJsonOptionsByID(id: any) {
     try {
-      const { data, error } = await supabase
-        .rpc('deleteoptionbyid', {
-          e: id
-        })
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('rpc/deleteoptionbyid', { e: id });
+      if (response) {
+
+        return response.data;
       } else {
-        return data;
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
   },
 
   //getKindByID
   async getKindByID(id: any) {
     try {
-      const { data, error } = await supabase
-        .rpc('getkindbyid', {
-          e: id
-        })
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('rpc/getkindbyid', { e: id });
+      if (response) {
+
+        return response.data;
       } else {
-        return data;
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
   },
 
   //getTypeByID
   async getTypeByID(id: any) {
     try {
-      const { data, error } = await supabase
-        .rpc('getnodesbyid', {
-          e: id
-        })
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('rpc/getnodesbyid', { e: id });
+      if (response) {
+
+        return response.data;
       } else {
-        return data;
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
   },
 
@@ -216,25 +187,28 @@ const databaseService = {
 
     return true;
   },
-
-  updateNode: async (name: any, id_kind: any, id_type: any, json_option: any) => {
+  updateNode: async (id: number, name: any, id_kind: any, id_type: any, json_option: any) => {
     try {
-      const response = await axiosInstance.put('Nodes', {
-        name: name, id_kind: id_kind, id_type: id_type
-      });
+      const response = await axiosInstance.patch('Nodes?id=eq.' + id, { id_kind: id_kind, id_type: id_type, name: name });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
     } catch (error) {
       console.error('Error:', error);
-
-      return false;
     }
     try {
-      const response = await axiosInstance.put('JsonOptions', {
-        json_option: json_option
-      });
+      const response = await axiosInstance.patch('JsonOptions?id=eq.' + id, { name_jsonoptions: json_option });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
     } catch (error) {
       console.error('Error:', error);
-
-      return false;
     }
 
     return true;
@@ -243,44 +217,90 @@ const databaseService = {
   //add kind
   async addKind(name_kind: any) {
     try {
-      const { data, error } = await supabase
-        .from('Kind')
-        .insert([
-          { name_kind: name_kind },
-        ])
-        .select();
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('Kind', {
+        name_kind: name_kind
+      });
+      if (response) {
+
+        return response;
       } else {
-        console.log(data);
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
+    }
+  },
+
+  //create workflow 
+  async createWorkflow(name: any, createdAt: any, userId: any, script: any) {
+    try {
+      const response = await axiosInstance.post('Workflows', {
+        name: name, createdAt: createdAt, userId: userId, script: script
+      });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  },
+
+  //delete workflow
+  async deleteWorkflow(id: any) {
+    try {
+      const response = await axiosInstance.post('Workflows?id=eq.' + id);
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
 
     return true;
   },
+  //update kind
+  async updateKind(id: string, name_kind: string) {
+    try {
+      const response = await axiosInstance.post('Kind?id=eq.' + id, { name_kind: name_kind });
+      if (response) {
 
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    return true;
+  },
+  //
   //delete kind
   async deleteKind(id: any) {
     try {
-      const { error } = await supabase
-        .from('Kind')
-        .delete()
-        .eq('id', id);
-      if (error) {
-        console.error('Error:', error.message);
+      const response = await axiosInstance.post('Kind?id=eq.' + id);
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
       }
     } catch (error) {
-      console.error('Error:', (error as Error).message);
+      console.error('Error:', error);
     }
 
     return true;
   },
-
   //getElementType
   async getElementType() {
     try {
+      console.log("Khởi chạy getElementType");
       const response = await axiosInstance.get('/ElementType');
 
       return response.data;
@@ -289,54 +309,103 @@ const databaseService = {
       throw error;
     }
   },
+  //add type 
+  async addType(name_type: any) {
+    try {
+      const response = await axiosInstance.post('Type', {
+        name_type: name_type
+      });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    return true;
+  },
+  //update type name_type: newName
+  async editType(id: string, newName: string) {
+    try {
+      const response = await axiosInstance.post('Type?id=eq.' + id, { name_type: newName });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  },
+  //delete type
+  async deleteType(id: any) {
+    try {
+      const response = await axiosInstance.post('Type?id=eq.' + id);
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    return true;
+  },
+
 
   //user
-  async sign_in(email: any, password: any) {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-      if (error) {
-        return error;
-      }
-      else {
-        return true;
-      }
-    } catch (error: any) {
-      console.error('Login error:', error.message);
-      throw new Error('Login failed');
-    }
-    //   try {
-    //     const { user, error } = await supabase.auth.signInWithPassword({
-    //       email: email,
-    //       password: password,
-    //     });
+  // async sign_in(email: any, password: any) {
+  //   try{
+  //     const { error } = await supabase.auth.signInWithPassword({
+  //       email: email,
+  //       password: password,
+  //     });
+  //     if(error){
+  //       return error;
+  //     }
+  //     else {
+  //       return true;
+  //     }
+  //   } catch (error:any) {
+  //     console.error('Login error:', error.message);
+  //     throw new Error('Login failed');
+  //   }
+  //   try {
+  //     const { user, error } = await supabase.auth.signInWithPassword({
+  //       email: email,
+  //       password: password,
+  //     });
 
-    //     if (error) {
-    //       console.error('Login error:', error.message);
-    //       throw new Error('Login failed');
-    //     }
+  //     if (error) {
+  //       console.error('Login error:', error.message);
+  //       throw new Error('Login failed');
+  //     }
 
-    //     // Retrieve the current user and session
-    //     const currentUser = supabase.auth.user();
-    //     const currentSession = supabase.auth.session();
+  //     // Retrieve the current user and session
+  //     const currentUser = supabase.auth.user();
+  //     const currentSession = supabase.auth.session();
 
-    //     if (currentUser && currentSession) {
-    //       localStorage.setItem('access_token', currentSession.access_token);
-    //       localStorage.setItem('refresh_token', currentSession.refresh_token);
-    //     }
-    // } catch (error) {
-    //   console.error('Login error:', error.message);
-    //   throw new Error('Login failed');
-    // }
-  },
-  async sign_up() {
+  //     if (currentUser && currentSession) {
+  //       localStorage.setItem('access_token', currentSession.access_token);
+  //       localStorage.setItem('refresh_token', currentSession.refresh_token);
+  //     }
+  // } catch (error) {
+  //   console.error('Login error:', error.message);
+  //   throw new Error('Login failed');
+  // }
+  // },   
+  // async sign_up() {
 
-  },
-  async sign_out() {
+  // },
+  // async sign_out() {
 
-  }
+  // },
 };
 
 export default databaseService;

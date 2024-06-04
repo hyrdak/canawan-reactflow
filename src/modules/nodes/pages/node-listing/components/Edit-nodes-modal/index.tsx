@@ -1,8 +1,8 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactJson from 'react-json-view';
 
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, message,Modal, Select } from 'antd';
+import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 
 import databaseService from '../../../../../../databaseService';
@@ -10,7 +10,7 @@ import databaseService from '../../../../../../databaseService';
 
 
 
-export default function ModalEditNode(e:any) {
+export default function ModalEditNode(e: any) {
     const [form] = useForm();
     const [open, setOpen] = useState(false);
 
@@ -47,40 +47,40 @@ export default function ModalEditNode(e:any) {
     }
 
     //check json
-    function isJSONString(str:any) {
+    function isJSONString(str: any) {
         try {
             JSON.parse(str);
-            
-return true;
+
+            return true;
         } catch (error) {
             return false;
         }
     }
 
     const Add_Node = async () => {
-        if( name !== '' && textAreaValue !== '' && type !== 0 && kind !==0 ) {
-            if(isJSONString(textAreaValue)) {
-                if(await databaseService.addNode(name, kind, type, JSON.parse(textAreaValue))) {
+        if (name !== '' && textAreaValue !== '' && type !== 0 && kind !== 0) {
+            if (isJSONString(textAreaValue)) {
+                if (await databaseService.addNode(name, kind, type, JSON.parse(textAreaValue))) {
                     message.success('Thêm thành công!');
                     window.location.href = '/nodes';
-                }else {
+                } else {
                     message.error('Thêm thất bại!');
                 }
-            }else {
+            } else {
                 message.error('Vui lòng nhập đúng định dạng json!');
             }
-        }else {
+        } else {
             message.error('Vui lòng nhập đầy đủ thông tin!');
         }
     }
-    
+
     const fetchData = async () => {
         console.log(e.json);
     }
 
     return (
         <>
-            <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => {setOpen(true);fetchData()}}></Button>
+            <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => { setOpen(true); fetchData() }}></Button>
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
@@ -88,7 +88,7 @@ return true;
                 destroyOnClose
                 onCancel={() => setOpen(false)}
                 onOk={() => Add_Node()}
-            
+
             >
                 <Form form={form}
                     layout="vertical"
@@ -108,7 +108,7 @@ return true;
                                         key={field.key}
                                     >
                                         <Form.Item label="Name">
-                                            <Input 
+                                            <Input
                                                 onChange={handleChangeName}
                                                 value={e.json.name}
                                             />

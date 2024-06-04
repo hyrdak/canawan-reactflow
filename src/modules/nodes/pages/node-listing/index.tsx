@@ -16,6 +16,7 @@ import { getTableColumnsConfig } from './table-config';
 const NodeListingRoot = () => {
     const [data, setData] = useState<Array<any>>();
 
+
     const getListNodes = async () => {
         const nodes = await databaseService.getDataNodeList();
         setData(nodes);

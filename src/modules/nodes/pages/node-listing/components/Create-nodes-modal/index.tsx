@@ -58,7 +58,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [dataJson, setDataJson] = useState<DataJson[]>([]);
 
     const queryClient = useQueryClient();
-
     useEffect(() => {
         const fetchData = async () => {
             setDataType(await databaseService.getType());
@@ -68,6 +67,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
 
         };
         fetchData();
+        fetchDataProps()
     }, []);
 
     useEffect(() => {
@@ -80,7 +80,21 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             });
         }
 
+
     }, [record, form]);
+
+    function fetchDataProps() {
+        if (record) {
+            record.name_jsonoptions.map((item: any) => {
+                if (item.props[0] === undefined) {
+                    item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+                        propName,
+                        propValue: propValue
+                    }));
+                }
+            });
+        }
+    }
     // useEffect(() => {
     //     if (open && record) {
     //         const currentElementType = record.name_jsonoptions[0]?.elementType; // Assuming you're using the first json option's elementType to determine the props
@@ -123,6 +137,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             }
         });
     };
+
 
     const HandleEditCreateNodes = async (value: any) => {
 
@@ -342,32 +357,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                 <Form.List name={[field.name, 'props']}>
                                                     {(nestedFields, { add: addNested, remove: removeNested }) => (
                                                         <>
-                                                            {nestedFields.map((nestedField) => (record ? (
-                                                                <Form style={{ display: 'flex', marginBottom: 30 }}>
-                                                                    <Form.Item
-                                                                        name={[nestedField.name, 'propName']}
-                                                                        rules={[{ required: true, message: 'Please input the prop value!' }]}
-                                                                    >
-                                                                        <AutoComplete
-                                                                            style={{ width: 200 }}
-                                                                            options={options}
-                                                                            placeholder="Prop Name"
-                                                                            filterOption={(inputValue, option) =>
-                                                                                option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                                                                            }
-                                                                        />
-                                                                    </Form.Item>
-                                                                    <Form.Item
-                                                                        name={[nestedField.name, 'propValue']}
-                                                                        rules={[{ required: true, message: 'Please input the prop name!' }]}
-                                                                    >
-                                                                        <Input placeholder="Basic usage" />
-                                                                    </Form.Item>
 
-                                                                </Form>
-                                                            ) : (
-                                                                <p>No data available</p>
-                                                            )))}
 
                                                             {nestedFields.map((nestedField) => (
                                                                 <Space key={nestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">

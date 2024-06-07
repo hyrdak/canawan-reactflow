@@ -17,11 +17,11 @@ const KindListingRoot = () => {
     const [query, setQuery] = useState('');
     const [currentpage, setCurrentPage] = useState(1);
 
-    const fetchData = async (searchParam = '') => {
+    const fetchData = async (searchParam = '', page = 1) => {
         try {
             let result;
             if (searchParam) {
-                const url = `/kinds?search=${searchParam}`;
+                const url = `/kinds?search=${searchParam}&page=${page}`;
                 const response = await axios.get(url);
                 result = response.data;
             } else {
@@ -47,30 +47,37 @@ const KindListingRoot = () => {
     }
 
     useEffect(() => {
-        // Lấy từ khóa tìm kiếm từ URL khi component mount
+        // Lấy từ khóa tìm kiếm và trang hiện tại từ URL khi component mount
         const urlParams = new URLSearchParams(window.location.search);
         const searchParam = urlParams.get('search');
+        const pageParam = urlParams.get('page');
+        const page = pageParam ? parseInt(pageParam) : 1;
+        setCurrentPage(page);
+        
         if (searchParam) {
             setSearch(searchParam);
             setQuery(searchParam);
-            fetchData(searchParam);
+            fetchData(searchParam, page);
         } else {
-            fetchData();
+            fetchData('', page);
         }
 
         // Lắng nghe sự kiện popstate
         const handlePopState = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const searchParam = urlParams.get('search');
+            const pageParam = urlParams.get('page');
+            const page = pageParam ? parseInt(pageParam) : 1;
+            setCurrentPage(page);
 
             if (searchParam) {
                 setSearch(searchParam);
                 setQuery(searchParam);
-                fetchData(searchParam);
+                fetchData(searchParam, page);
             } else {
                 setSearch('');
                 setQuery('');
-                fetchData();
+                fetchData('', page);
             }
         };
 
@@ -83,7 +90,8 @@ const KindListingRoot = () => {
 
     const handleSearch = async () => {
         setQuery(search);
-        const url = `/kinds?search=${search}`;
+        setCurrentPage(1); // Trang hiện tại = 1 khi tìm kiếm
+        const url = `/kinds?search=${search}&page=1`;
         console.log(`Sending request to: ${url}`);
         try {
             // Thay đổi URL trong trình duyệt mà không làm tải lại trang
@@ -95,6 +103,16 @@ const KindListingRoot = () => {
         } catch (error) {
             console.error('Error searching:', error);
         }
+    };
+
+    const handleTableChange = (pagination: any) => {
+        const newPage = pagination.current;
+        setCurrentPage(newPage);
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('search');
+        const url = searchParam ? `/kinds?search=${searchParam}&page=${newPage}` : `/kinds?page=${newPage}`;
+        window.history.pushState({}, '', url);
+        fetchData(searchParam || '', newPage);
     };
 
     const filteredData = useMemo(() => {
@@ -113,10 +131,6 @@ const KindListingRoot = () => {
         },
         ...getTableColumnsConfig({ data })
     ];
-
-    const handleTableChange = (pagination: any) => {
-        setCurrentPage(pagination.current);
-    };
 
     return (
         <div>
@@ -143,7 +157,7 @@ const KindListingRoot = () => {
                 dataSource={filteredData} 
                 columns={columns} 
                 bordered 
-                pagination={{ pageSize: 10 }}
+                pagination={{ pageSize: 10, current: currentpage }}
                 onChange={handleTableChange}
                 rowKey="id"
             />

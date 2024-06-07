@@ -431,12 +431,50 @@ async deleteType(id:any) {
     //   throw new Error('Login failed');
     // }
   },   
-  async sign_up() {
-    
-  },
-  async sign_out() {
-    
-  },
+  async sign_up(supabase: any, email: any, password: any) {
+    try {
+        const { error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+        });
+        if (error) {
+            if (error.message.includes('already registered')) {
+                return { success: false, message: 'Email đã được sử dụng. Vui lòng chọn email khác.' };
+            } else {
+                return { success: false, message: `Lỗi đăng ký: ${error.message}` };
+            }
+        }
+        
+return { success: true, message: 'Đăng ký thành công' };
+    } catch (error: any) {
+        return { success: false, message: `Lỗi đăng ký: ${error.message}` };
+    }
+},
+
+
+
+ 
+    async sign_out(supabase: SupabaseClient, toast: any, redirectPath: string) {
+      try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+              console.error('Error:', error.message);
+              toast.error('Đăng xuất thất bại');
+          } else {
+              localStorage.removeItem('token');
+              toast.success('Đăng xuất thành công');
+              if (redirectPath) {
+                  window.location.href = redirectPath;
+              }
+          }
+      } catch (error) {
+          console.error('Error:', (error as Error).message);
+          toast.error('Đăng xuất thất bại');
+      }
+  }
+  
+ 
+
 };
 
 export default databaseService;

@@ -117,6 +117,7 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
+
   },
 
   //deleteNodeByID

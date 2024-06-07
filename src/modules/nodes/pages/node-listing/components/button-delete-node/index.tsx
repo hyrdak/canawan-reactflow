@@ -1,32 +1,36 @@
 import React from 'react';
-import { QUERY_KEYS, ROUTE_PATHS } from 'constants-es';
+import { QUERY_KEYS } from 'constants-es';
 
 import { DeleteOutlined } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button } from 'antd';
-import confirm from 'antd/es/modal/confirm';
+import { Button, Modal } from 'antd';
 
-import { useMutationDeleteWorkflow } from 'modules/work-flows/data/queries/use-query-remove-workflow';
+import { useMutationdeleteNode } from 'modules/nodes/data/use-query-remove-node'
 
 type Props = { data: any };
 
 const ButtonDelete = ({ data }: Props) => {
-    const mutationDelete = useMutationDeleteWorkflow();
+    const mutationDeleteN = useMutationdeleteNode();
     const queryClient = useQueryClient();
 
     const handleRemove = () => {
-        confirm({
+        Modal.confirm({
             title: '',
             type: 'warning',
             content: 'Are you sure to delete this item?',
+            okText: 'OK',
+            cancelText: 'Cancel',
+            onCancel(...args) {
+                console.log('delete');
+
+            },
             onOk() {
-                return mutationDelete.mutateAsync(data.id, {
+                return mutationDeleteN.mutateAsync(data.id, {
                     onSuccess: (response: any) => {
-                        if (response.success) {
-                            queryClient.invalidateQueries({
-                                queryKey: [QUERY_KEYS.NODES]
-                            });
-                        }
+                        queryClient.invalidateQueries({
+                            queryKey: [QUERY_KEYS.NODES]
+                        });
+
                     }
                 });
             }
@@ -37,7 +41,7 @@ const ButtonDelete = ({ data }: Props) => {
         <>
             {' '}
             <Button
-                loading={mutationDelete.isPending}
+                loading={mutationDeleteN.isPending}
                 icon={<DeleteOutlined />}
                 type="primary"
                 danger

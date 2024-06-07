@@ -1,24 +1,14 @@
 import ReactJson from 'react-json-view';
 import databaseService from 'databaseService';
 
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Popconfirm } from 'antd';
+import { Popover } from 'antd';
 
-import ModalCreateNode from './components/Create-nodes-modal';
-import ModalEditNode from './components/Edit-nodes-modal';
+import ButtonDelete from './components/button-delete-node'
+import ModalCreateNode from './components/Create-edit-nodes-modal';
 
 
 interface GetTableColumnsConfigProps { }
-function handleEdit(record: any): void {
-    console.log(record);
 
-}
-
-function handleDelete(id: any) {
-    databaseService.deleteNodeByID(id);
-    localStorage.setItem('flag_load', 'true');
-    window.location.href = '/nodes'
-}
 export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
     const columnConfig: any[] = [
         {
@@ -73,17 +63,15 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
             key: 'actions',
             width: 101,
             render: (text: string, record: any) => (
-                <span>
-                    <ModalCreateNode record={record} />
-                    <Popconfirm
-                        title="Are you sure to delete this type?"
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button type="primary" danger icon={<DeleteOutlined />}></Button>
-                    </Popconfirm>
-                </span>
+                <Popover
+                    placement="bottom"
+                    trigger="click"
+                >
+                    <div className="flex gap-2">
+                        <ModalCreateNode record={record} />
+                        <ButtonDelete data={record} />
+                    </div>
+                </Popover>
             ),
         },
     ];

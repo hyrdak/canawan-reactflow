@@ -55,7 +55,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
     const [options, setOptions] = useState<DataProps[]>([]);
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
-    const [dataJson, setDataJson] = useState<DataJson[]>([]);
 
     const queryClient = useQueryClient();
     useEffect(() => {
@@ -63,38 +62,42 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             setDataType(await databaseService.getType());
             setDataKind(await databaseService.getKind());
             setDataElementType(await databaseService.getElementType());
-            setDataJson(await databaseService.getJsonOptions());
 
         };
         fetchData();
-        fetchDataProps()
     }, []);
 
-    useEffect(() => {
-        if (record) {
-            form.setFieldsValue({
-                name: record.name,
-                type: record.name_type,
-                kind: record.name_kind,
-                jsons: record.name_jsonoptions,
-            });
-        }
-
-
-    }, [record, form]);
-
-    function fetchDataProps() {
-        if (record) {
-            record.name_jsonoptions.map((item: any) => {
-                if (item.props[0] === undefined) {
-                    item.props = Object.entries(item.props).map(([propName, propValue]) => ({
-                        propName,
-                        propValue: propValue
-                    }));
+    if (record) {
+        form.setFieldsValue({
+            name: record.name,
+            type: record.name_type,
+            kind: record.name_kind,
+            jsons: record.name_jsonoptions,
+            props: record.name_jsonoptions.map((item: any) => {
+                if (open && record.name_jsonoptions) {
+                    if (item.props[0] === undefined) {
+                        item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+                            propName,
+                            propValue: propValue
+                        }));
+                    }
                 }
-            });
-        }
+            })
+        });
     }
+
+    // function fetchDataProps() {
+    //     if (record) {
+    //         record.name_jsonoptions.map((item: any) => {
+    //             if (item.props[0] === undefined) {
+    //                 item.props = Object.entries(item.props).map(([propName, propValue]) => ({
+    //                     propName,
+    //                     propValue: propValue
+    //                 }));
+    //             }
+    //         });
+    //     }
+    // }
     // useEffect(() => {
     //     if (open && record) {
     //         const currentElementType = record.name_jsonoptions[0]?.elementType; // Assuming you're using the first json option's elementType to determine the props
@@ -198,6 +201,9 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             if (success) {
                 message.success('Create Node Succes!');
                 setOpen(false);
+                queryClient.invalidateQueries({
+                    queryKey: [QUERY_KEYS.NODES]
+                });
             } else {
                 message.error('Create Node Failed!');
             }

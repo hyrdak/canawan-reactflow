@@ -66,7 +66,21 @@ const PrivateLayout = ({ children ,supabase,users }: Props) => {
     const {
         token: { colorBgContainer, borderRadiusLG }
     } = theme.useToken();
-
+    //log out with supabase
+    const signoutAction = async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error('Error:', error.message);
+          }
+          toast.success("Đăng xuất thành công");
+          window.location.href = '/sign-in';
+        } catch (error) {
+          console.error('Error:', (error as Error).message);
+        }
+      };
+    //
+    
     return (
         <ValidateScreen>
             <Layout>

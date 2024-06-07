@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+import { createClient,SupabaseClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://ismbrwqkcootieaguzwa.supabase.co';
 const supabaseAPIUrl = 'https://ismbrwqkcootieaguzwa.supabase.co/rest/v1/';
 const supabaseAPIKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzbWJyd3FrY29vdGllYWd1endhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NTQyNDcsImV4cCI6MjAyODEzMDI0N30.fEo-ddluC6l2HNPqIjcHBFHTYdIWoE8vjfjIX9KPbPI';
+
+const supabase : SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
 
 const axiosInstance = axios.create({
   baseURL: supabaseAPIUrl,
@@ -372,8 +377,7 @@ async deleteType(id:any) {
     // } catch (error) {
     //   console.error('Login error:', error.message);
     //   throw new Error('Login failed');
-    // }
-  },   
+    // } 
   async sign_up(supabase: any, email: any, password: any) {
     try {
         const { error } = await supabase.auth.signUp({

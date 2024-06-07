@@ -26,7 +26,7 @@ const ModalPreviewExportData = ({ currentData }: Props) => {
         setLoading(true);
         try {
             setTimeout(() => {
-                const data: any = JSON.stringify(dataDisplay, null, 2); // Replace with your actual data
+                const data: any = JSON.stringify(dataDisplay, null, 2);
                 const blob = new Blob([data], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -65,7 +65,7 @@ const ModalPreviewExportData = ({ currentData }: Props) => {
             >
                 <div className="">
                     <ReactJson
-                        theme={'monokai'}
+                        // theme={'monokai'}
                         src={dataDisplay}
                         displayDataTypes={false}
                         style={{

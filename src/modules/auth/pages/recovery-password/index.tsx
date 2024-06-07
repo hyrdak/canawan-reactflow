@@ -1,123 +1,97 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ROUTE_PATHS } from 'constants-es';
-import { useAppDispatch } from 'libs/redux';
 
-import { Button, Form, Input, message } from 'antd';
 
-import { setAuth } from 'helpers/auth';
-import { setAuthUser } from 'data/store';
-import { useMutationRequestLogin, useMutationRequestUpdatePassword } from 'modules/auth/data/queries';
-import { useQueryCheckToken } from 'modules/auth/data/queries/use-query-check-token';
+import React, { useEffect, useState } from 'react';
+import { toast,ToastContainer } from 'react-toastify';
 
-const RecoveryPassword = () => {
-    const [searchParams] = useSearchParams();
-    const params = useParams();
-    const location = useLocation();
-    const navigation = useNavigate();
+import { SupabaseClient } from '@supabase/supabase-js';
 
-    const mutationRequestUpdatePassword = useMutationRequestUpdatePassword();
-    const dispatch = useAppDispatch();
-    // const { data, isFetched } = useQueryCheckToken({ token: params.token as string });
-    const hash = location.hash;
-    const tokenRecovery = new URLSearchParams(hash.slice(1)).get('access_token');
+interface Props {
+    supabase: SupabaseClient;
+    user:any,
+}
 
-    const handleFinish = ({ email, password }: any) => {
-        mutationRequestUpdatePassword.mutate(
-            { email, password, token: tokenRecovery as string },
-            {
-                onSuccess: (response) => {
-                    if (response.success) {
-                        message.success('Update password success');
-                        navigation(ROUTE_PATHS.SIGN_IN);
-                    } else {
-                        message.error(response.message);
-                    }
-                },
-                onError: (error: any) => {
-                    message.error(error.message);
-                }
+const RecoveryPassword: React.FC<Props> = ({ supabase,user }) => {
+    const [newEmail, setNewEmail] = useState<string>("")
+    const [password, setPassword] = useState('');
+    useEffect(() => {
+        if (user !== '') {
+          const fetchData = async () => {
+           setNewEmail(user.user_metadata.email);
+          };
+          fetchData();
+        }
+      }, [user]);
+    const updateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+            const { data, error } = await supabase.auth.updateUser({
+                email:newEmail,
+                password,
+                data: { hello: 'world' },
+            });
+            if (error) {
+                toast.error('Lỗi khi cập nhật thông tin người dùng:');
+                
+return;
             }
-        );
+            toast.success('Thông tin người dùng đã được cập nhật thành công!');
+            window.location.href="/sign-in";
+        } catch (error) {
+            console.error('Lỗi khi gọi phương thức updateUser:');
+        }
     };
 
-    if (!tokenRecovery) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="flex-col px-6 bg-white border rounded shadow-md min-w-fit py-14 ">
-                    <p>Link is not available or has expired</p>
-                    <Button type="primary" className="w-full p-2 mt-5 " href={ROUTE_PATHS.SIGN_IN} size="large">
-                        Back to login
-                    </Button>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="flex items-center justify-center h-screen">
-            <div className="flex-col px-6 bg-white border rounded shadow-md min-w-fit py-14 ">
-                <div className="flex justify-center mb-8">
-                    <img className="w-24" src="/logo200x200.png" alt="" />
-                </div>
-                <Form className="flex flex-col text-sm rounded-md" onFinish={handleFinish}>
-                    <Form.Item
-                        name={'email'}
-                        rules={[
-                            {
-                                required: true,
-                                whitespace: true,
-                                message: 'Please input your email!'
-                            },
-                            {
-                                type: 'email',
-                                message: 'The input is not valid E-mail!'
-                            }
-                        ]}
-                    >
-                        <Input size="large" placeholder="Email" />
-                    </Form.Item>
-                    <Form.Item
-                        name={'password'}
-                        rules={[
-                            {
-                                required: true,
-                                whitespace: true,
-                                message: 'Please input your password!'
-                            }
-                        ]}
-                    >
-                        <Input size="large" type="password" placeholder="Password" />
-                    </Form.Item>
-                    <Button
-                        loading={mutationRequestUpdatePassword.isPending}
-                        type="primary"
-                        className="w-full p-2 mt-5 "
-                        htmlType="submit"
-                        size="large"
-                    >
-                        Update Password
-                    </Button>
-                </Form>
-                <div className="flex justify-between mt-5 text-sm text-gray-600">
-                    <a href={ROUTE_PATHS.SIGN_IN}>Back to sign-in?</a>
-                    <a href={ROUTE_PATHS.SIGN_UP}>Sign up</a>
-                </div>
-                <div className="flex mt-5 text-sm text-center text-gray-400">
-                    <p>
-                        This site is protected by reCAPTCHA and the Google <br />
-                        <a className="underline" href="">
-                            Privacy Policy
-                        </a>{' '}
-                        and{' '}
-                        <a className="underline" href="">
-                            Terms of Service
-                        </a>{' '}
-                        apply.
-                    </p>
-                </div>
-            </div>
+        <div className="absolute inset-0 bg-gradient-to-tl from-purple-600 to-cyan-400 flex items-center justify-center">
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <div className="w-full max-w-md bg-white rounded-lg shadow-md dark:border dark:border-gray-700 p-6 space-y-4">
+          <h1 className="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+            Đặt lại mật khẩu
+          </h1>
+          <form className="space-y-4 md:space-y-6" onSubmit={updateUser}>
+                        <div>
+                            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email của bạn</label>
+                            <input 
+                            type="email" 
+                            name="newemail" 
+                            id="newemail" 
+                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            required
+                            value={newEmail}
+                            disabled
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mật khẩu mới</label>
+                            <input 
+                            type="password" 
+                            name="password" 
+                            id="password" 
+                            placeholder="••••••••" 
+                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}/>
+                        </div>
+                        <button 
+                        type="submit" 
+                        className="w-full text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                        >Đổi mật khẩu</button>
+                    </form>
+          
         </div>
+        <ToastContainer position="top-center" />
+      </div>
     );
 };
 

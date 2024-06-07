@@ -1,103 +1,59 @@
 import { useEffect, useMemo, useState } from 'react';
 import databaseService from 'databaseService';
 
-import { RollbackOutlined, SwapLeftOutlined } from '@ant-design/icons';
-import { Button, Table } from 'antd';
-import { flatten } from 'lodash';
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Table } from 'antd';
 
-import { dataCommandModal } from 'components/common/react-flows/components/nodes/data';
-import { getListCommandNode } from 'components/common/react-flows/constants';
-import { COMMAND_NODE_LABELS, CommandNode, KindNode } from 'components/common/react-flows/constants/enum';
 import { PageHeaderProvider } from 'components/core/page-header-provider';
 
-import ModalCreateNode from './components/Create-kinds-modal';
+import ModalCreateKind from './components/Create-kinds-modal';
+// import FilterComponent from './components/filter-component';
 import { getTableColumnsConfig } from './table-config';
 
 const KindListingRoot = () => {
-    const [listDnd, setListDnd] = useState<any>([]);
     const [data, setData] = useState<Array<any>>([]);
-
+    const [search, setSearch] = useState('');
     const handleGetData = async () => {
-        setData(await databaseService.getKind());
-        console.log(localStorage.getItem('NodesList'));
-        const listLocalStore = localStorage.getItem('listReactFlowInstance');
         try {
-            if (listLocalStore && Array.isArray(JSON.parse(listLocalStore))) {
-                setListDnd(JSON.parse(listLocalStore));
-            }
+            const result = await databaseService.getKind();
+            setData(result);
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }
     };
-
-    const handleCreated = (data: any) => {
-        const newListDnd = [...listDnd, data];
-        setListDnd(newListDnd);
-        localStorage.setItem('listReactFlowInstance', JSON.stringify(newListDnd));
-    };
-
     useEffect(() => {
         handleGetData();
     }, []);
-
-    const handleRemove = (item: any) => {
-        const newListDnd = listDnd.filter((i: any) => i.id !== item.id);
-        setListDnd(newListDnd);
-        localStorage.setItem('listReactFlowInstance', JSON.stringify(newListDnd));
-    };
-
-
-
-    // const DataNode = useMemo(async () => {
-    //     const inputNode = [
-    //         {
-    //             id: CommandNode.Start,
-    //             kind: 'initial',
-    //             action: CommandNode.Start,
-    //             dataOptions: dataCommandModal[CommandNode.Start],
-    //             type: 'input',
-    //             name: COMMAND_NODE_LABELS[CommandNode.Start]
-    //         },
-    //         {
-    //             id: CommandNode.Stop,
-    //             kind: 'Other',
-    //             action: CommandNode.Stop,
-    //             dataOptions: dataCommandModal[CommandNode.Start],
-    //             type: 'Other',
-    //             name: COMMAND_NODE_LABELS[CommandNode.Stop]
-    //         }
-    //     ];
-
-    //     const customNode = Object.entries(KindNode).reduce((dataSource: any[], [key, value]: any) => {
-    //         const itemList = getListCommandNode(value).map((item: CommandNode) => ({
-    //             id: item,
-    //             kind: value,
-    //             type: 'custom',
-    //             dataOptions: dataCommandModal[item],
-    //             name: COMMAND_NODE_LABELS[item]
-    //         }));
-
-    //         return flatten([dataSource, itemList]);
-    //     }, []);
-
-
-    //     return data;
-    // }, []);
+    const filteredData = useMemo(() => {
+        return data.filter(item =>
+            item.name_kind.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [search, data]);
 
     const columns = getTableColumnsConfig({});
-    // console.log(data);
-
-    return (
-        <div style={{}}>
-            {/* <PageHeaderProvider extra={<ModalCreateReactFlow listDnd={listDnd} onCreated={handleCreated} />} /> */}
-            <PageHeaderProvider extra={<ModalCreateNode />} />
-            <div className='mb-2'>
+    
+return (
+        <div>
+            <PageHeaderProvider extra={<ModalCreateKind />} />
+            <div className='flex items-center'>
                 <a className=' text-black' onClick={() => window.location.href = '/nodes'} >
-                    <SwapLeftOutlined />Nodes
+                    <ArrowLeftOutlined /> Nodes
                 </a>
+                {/* <FilterComponent /> */}
+                <div className="flex justify-end gap-3" style={{ marginLeft: 625 }}>
+                    <Form.Item className="w-[220px]">
+                        <Input placeholder="Enter keyword" value={search} onChange={e => setSearch(e.target.value)}></Input>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                            Search
+                        </Button>
+                    </Form.Item>
+                </div>
+       
             </div>
-            <Table dataSource={data} columns={columns} bordered />
-        </div>
+            <Table dataSource={filteredData} columns={columns} bordered />
+        </div> 
     );
 };
 

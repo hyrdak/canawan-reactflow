@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ROUTE_PATHS } from 'constants-es';
+import databaseService from 'databaseService';
 
-import { EditOutlined } from '@ant-design/icons';
-import { Button, Popover } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, message, Popconfirm, Popover } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { BsThreeDots } from 'react-icons/bs';
 
-import ButtonDelete from './components/button-delete';
+import { dataCommandModal } from 'components/common/react-flows/components/nodes/data';
+
 import ExportData from './components/modal-preview-export-data';
 
 interface GetTableColumnsConfigProps {
@@ -32,9 +34,16 @@ export const getTableColumnsConfig = ({ isSmallScreen }: GetTableColumnsConfigPr
             title: 'Actions',
             dataIndex: 'actions',
             key: 'actions',
-            width: 100,
+            width: 220,
 
             render: (_: any, record: any) => {
+                async function handleDelete(id: any) {
+                    if(await databaseService.deleteWorkflow(id)) {
+                        message.success('Success!');
+                        setTimeout(() => {window.location.href = '/work-flows';}, 1000)
+                    }
+                }
+
                 return isSmallScreen ? (
                     <Popover
                         content={
@@ -43,7 +52,14 @@ export const getTableColumnsConfig = ({ isSmallScreen }: GetTableColumnsConfigPr
                                     <Button icon={<EditOutlined />} type="primary"></Button>
                                 </Link>
                                 <ExportData currentData={record} />
-                                <ButtonDelete data={record} />
+                                <Popconfirm
+                                    title="Are you sure to delete this type?"
+                                    onConfirm={() => handleDelete(record.id)}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type="primary" danger icon={<DeleteOutlined />}></Button>
+                                </Popconfirm>
                             </div>
                         }
                         placement="bottom"
@@ -66,7 +82,14 @@ export const getTableColumnsConfig = ({ isSmallScreen }: GetTableColumnsConfigPr
                             <Button icon={<EditOutlined />} type="primary"></Button>
                         </Link>
                         <ExportData currentData={record} />
-                        <ButtonDelete data={record} />
+                        <Popconfirm
+                            title="Are you sure to delete this type?"
+                            onConfirm={() => handleDelete(record.id)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Button type="primary" danger icon={<DeleteOutlined />}></Button>
+                        </Popconfirm>
                     </div>
                 );
             }

@@ -11,10 +11,10 @@ const supabaseUrl = 'https://ismbrwqkcootieaguzwa.supabase.co';
 const supabaseAPIKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzbWJyd3FrY29vdGllYWd1endhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NTQyNDcsImV4cCI6MjAyODEzMDI0N30.fEo-ddluC6l2HNPqIjcHBFHTYdIWoE8vjfjIX9KPbPI';
 const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
 
-const ModalEditKind = ({ id, name_kind }: { id: string, name_kind: string }) => {
+const ModalEditType = ({ id, nameType }: { id: string, nameType: string }) => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
-    const [type, setType] = useState<string>(name_kind);
+    const [type, setType] = useState<string>(nameType);
 
     const handleSubmit = async () => {
         if (!id) {
@@ -24,7 +24,7 @@ return;
         }
         
         try {
-            await databaseService.updateKind(id, type);
+            await databaseService.editType(id, type);
             message.success('Cập nhật thành công!');
             setOpen(false);
         } catch (error) {
@@ -41,6 +41,7 @@ return;
                 icon={<EditOutlined />}
                 onClick={() => setOpen(true)}
             >
+                
             </Button>
             <Modal
                 open={open}
@@ -75,4 +76,4 @@ return;
 };
 
 
-export default ModalEditKind;
+export default ModalEditType;

@@ -1,5 +1,4 @@
 import ReactJson from 'react-json-view';
-import databaseService from 'databaseService';
 
 import { Popover } from 'antd';
 
@@ -15,7 +14,7 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
             title: '#',
             key: 'id',
             dataIndex: 'id',
-            width: 50,
+            width: 10,
             align: 'center',
             render: (_id: string, _record: any, index: number) => <span className="capitalize">{index + 1}</span>
         },
@@ -23,7 +22,7 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
             title: 'Name',
             key: 'name',
             dataIndex: 'name',
-            width: 200
+            width: 150
         },
         {
             title: 'Type',
@@ -78,3 +77,4 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
 
     return columnConfig;
 };
+export default getTableColumnsConfig;

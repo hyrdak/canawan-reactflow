@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { toast,ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'libs/redux';
 import { cx } from 'utils';
 
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Avatar, Divider, FloatButton, Layout, message, theme } from 'antd';
 import { VscSignOut } from 'react-icons/vsc';
 import { isEmpty } from 'lodash';
@@ -23,25 +25,27 @@ const { Header, Sider, Content } = Layout;
 
 type Props = {
     children: React.ReactNode | React.ReactNode[];
+    supabase: SupabaseClient;
+    users:any,
 };
 
-const PrivateLayout = ({ children }: Props) => {
+const PrivateLayout = ({ children,supabase,users }: Props) => {
     const { isSmallScreen } = useUIConfig();
     const [collapsed, setCollapsed] = useState(isSmallScreen);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { data: adminUserProfile, isFetching: isLoadingAdminUserProfile, isFetched } = useQueryUserProfile();
     const user = adminUserProfile?.data;
+    const [newEmail, setNewEmail] = useState<string>("")
 
-    useEffect(() => {
-        if (!isEmpty(adminUserProfile?.data)) {
-            dispatch(
-                setAuthUser({
-                    user: adminUserProfile?.data
-                })
-            );
+     useEffect(() => {
+        if (users !== '') {
+          const fetchData = async () => {
+           setNewEmail(users.user_metadata.email);
+          };
+          fetchData();
         }
-    }, [dispatch, adminUserProfile?.data]);
+      }, [users]);
 
     const mutationLogout = useMutationLogout();
     const handleLogout = useCallback(() => {
@@ -61,7 +65,21 @@ const PrivateLayout = ({ children }: Props) => {
     const {
         token: { colorBgContainer, borderRadiusLG }
     } = theme.useToken();
-
+    //log out with supabase
+    const signoutAction = async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error('Error:', error.message);
+          }
+          toast.success("Đăng xuất thành công");
+          window.location.href = '/sign-in';
+        } catch (error) {
+          console.error('Error:', (error as Error).message);
+        }
+      };
+    //
+    
     return (
         <ValidateScreen>
             <Layout>
@@ -105,7 +123,7 @@ const PrivateLayout = ({ children }: Props) => {
                                 'justify-center': collapsed,
                                 'justify-between': !collapsed
                             })}
-                            onClick={handleLogout}
+                            onClick={signoutAction}
                         >
                             {' '}
                             <div className="flex items-end">
@@ -121,7 +139,7 @@ const PrivateLayout = ({ children }: Props) => {
                                         'ml-3s': !collapsed
                                     })}
                                 >
-                                    {user?.email}
+                                    {users?.email}
                                 </span>
                             </div>
                             <span
@@ -166,6 +184,7 @@ const PrivateLayout = ({ children }: Props) => {
                     </Content>
                 </Layout>
             </Layout>
+            <ToastContainer position='top-center'/>
         </ValidateScreen>
     );
 };

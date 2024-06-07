@@ -76,7 +76,6 @@ const databaseService = {
     try {
       const response = await axiosInstance.post('rpc/getnodes');
       if (response) {
-
         return response.data;
       } else {
         console.error('Error:', response);
@@ -222,7 +221,6 @@ const databaseService = {
         name_kind: name_kind
       });
       if (response) {
-
         return response;
       } else {
         console.error('Error:', response);
@@ -317,7 +315,6 @@ const databaseService = {
         name_type: name_type
       });
       if (response) {
-
         return response;
       } else {
         console.error('Error:', response);

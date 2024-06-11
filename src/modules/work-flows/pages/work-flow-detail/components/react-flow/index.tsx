@@ -7,6 +7,8 @@ import ReactFlow, {
   Edge,
   MiniMap,
   Node,
+  NodeResizer,
+  NodeToolbar,
   useEdgesState,
   useNodesState,
 } from 'reactflow';
@@ -62,9 +64,7 @@ function Flow() {
     >
       <Background />
       <MiniMap />
-      <Controls
-        style={{marginLeft:900}}
-      />
+      <Controls position="top-right" />
       <div className="border-t rounded" style={{ 
         position: 'absolute', 
         top: 0, 

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast,ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import databaseService from 'databaseService'; // Import databaseService
 import { useAppDispatch } from 'libs/redux';
 import { cx } from 'utils';
 
@@ -30,7 +29,7 @@ type Props = {
     users:any,
 };
 
-const PrivateLayout = ({ children ,supabase,users }: Props) => {
+const PrivateLayout = ({ children,supabase,users }: Props) => {
     const { isSmallScreen } = useUIConfig();
     const [collapsed, setCollapsed] = useState(isSmallScreen);
     const dispatch = useAppDispatch();
@@ -39,14 +38,14 @@ const PrivateLayout = ({ children ,supabase,users }: Props) => {
     const user = adminUserProfile?.data;
     const [newEmail, setNewEmail] = useState<string>("")
 
-    useEffect(() => {
+     useEffect(() => {
         if (users !== '') {
-            const fetchData = async () => {
-             setNewEmail(users.user_metadata.email);
-            };
-            fetchData();
-          }
-        }, [users]);
+          const fetchData = async () => {
+           setNewEmail(users.user_metadata.email);
+          };
+          fetchData();
+        }
+      }, [users]);
 
     const mutationLogout = useMutationLogout();
     const handleLogout = useCallback(() => {
@@ -66,7 +65,21 @@ const PrivateLayout = ({ children ,supabase,users }: Props) => {
     const {
         token: { colorBgContainer, borderRadiusLG }
     } = theme.useToken();
-
+    //log out with supabase
+    const signoutAction = async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error('Error:', error.message);
+          }
+          toast.success("Đăng xuất thành công");
+          window.location.href = '/sign-in';
+        } catch (error) {
+          console.error('Error:', (error as Error).message);
+        }
+      };
+    //
+    
     return (
         <ValidateScreen>
             <Layout>
@@ -81,7 +94,7 @@ const PrivateLayout = ({ children ,supabase,users }: Props) => {
                         height: 'calc(100vh)',
                         position: 'fixed',
                         left: 0,
-top: 0,
+                        top: 0,
                         bottom: 0,
                         background: colorBgContainer
                     }}
@@ -110,8 +123,7 @@ top: 0,
                                 'justify-center': collapsed,
                                 'justify-between': !collapsed
                             })}
-                            
-                           
+                            onClick={signoutAction}
                         >
                             {' '}
                             <div className="flex items-end">
@@ -121,18 +133,17 @@ top: 0,
                                     src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                                 ></Avatar>{' '}
                                 <span
-                                    title={newEmail}
+                                    title={user?.email}
                                     className={cx('truncate w-3/4 inline-block', {
                                         hidden: !!collapsed,
                                         'ml-3s': !collapsed
                                     })}
                                 >
-                                    {newEmail}
+                                    {users?.email}
                                 </span>
                             </div>
                             <span
                                 title="logout"
-                                onClick={() => databaseService.sign_out(supabase, toast, '/sign-in')}
                                 className={cx(' hover:cursor-pointer', {
                                     hidden: !!collapsed,
                                     'mr-3': !collapsed,
@@ -140,7 +151,7 @@ top: 0,
                                 })}
                             >
                                 {' '}
-<VscSignOut size={16} />
+                                <VscSignOut size={16} />
                             </span>
                         </div>
                     </div>
@@ -156,7 +167,7 @@ top: 0,
                     <Header
                         style={{ padding: 0, background: colorBgContainer }}
                         className="flex items-center justify-center w-full bg-white border-b border-gray-300"
-                        >
+                    >
                         <PageHeader sidebarConfig={sidebarConfigs} />
                     </Header>
                     <Content
@@ -173,6 +184,7 @@ top: 0,
                     </Content>
                 </Layout>
             </Layout>
+            <ToastContainer position='top-center'/>
         </ValidateScreen>
     );
 };

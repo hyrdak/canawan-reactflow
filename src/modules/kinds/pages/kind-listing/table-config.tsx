@@ -2,7 +2,7 @@ import ReactJson from 'react-json-view';
 import databaseService from 'databaseService';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, message,Pagination,Popconfirm } from 'antd';
+import { Button, message,Popconfirm } from 'antd';
 
 import ModalEditKind from './components/Edit-kinds-modal';
 
@@ -21,14 +21,14 @@ async function handleDelete(id: any) {
 }
 export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
     const columnConfig: any[] = [
-        // {
-        //     title: 'Id',
-        //     key: 'id',
-        //     dataIndex: 'id',
-        //     width: 50,
-        //     align: 'center',
-        //     render: (_id: any, _record: any, index: number) => <span className="capitalize">{index+1}</span>
-        // },
+        {
+            title: 'Id',
+            key: 'id',
+            dataIndex: 'id',
+            width: 50,
+            align: 'center',
+            render: (_id: any, _record: any, index: number) => <span className="capitalize">{index+1}</span>
+        },
         {
             title: 'Kind',
             key: 'name_kind',

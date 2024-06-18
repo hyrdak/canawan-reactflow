@@ -26,20 +26,14 @@ return;
         try {
             await databaseService.editType(id, type);
             message.success('Cập nhật thành công!');
-            setType(nameType);
             setOpen(false);
-            
         } catch (error) {
             message.error(`Cập nhật thất bại! Lỗi: ${error}`);
             console.error(error);
         }
     };
-    const handleCancel = () => {
-        setType(nameType);
-        setOpen(false);
-    };
-    
-return (
+
+    return (
         <>
             <Button
                 type="primary"
@@ -54,9 +48,8 @@ return (
                 afterClose={() => form.resetFields()}
                 title="Chỉnh sửa tên loại"
                 destroyOnClose
-                onCancel={handleCancel}
+                onCancel={() => setOpen(false)}
                 onOk={handleSubmit}
-                afterOpenChange={()=>form.resetFields()}
             >
                 <Form
                     form={form}

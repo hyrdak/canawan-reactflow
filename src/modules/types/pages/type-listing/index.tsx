@@ -1,59 +1,153 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import databaseService from 'databaseService';
 
-import { SwapLeftOutlined } from '@ant-design/icons';
-import { Button, Table } from 'antd';
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Table } from 'antd';
+
+import { PageHeaderProvider } from 'components/core/page-header-provider';
 
 import ModalCreateNode from './components/Create-types-modal';
-import FilterComponent from './components/filter-component';
-import  {getTableColumnsConfig}  from './table-config';
+// import FilterComponent from './components/filter-component';
+import { getTableColumnsConfig } from './table-config';
 
 const TypeListingRoot = () => {
-    const [data, setData] = useState<any[]>([]);
-    const [filteredData, setFilteredData] = useState<any[]>([]);
-    const [searchError, setSearchError] = useState<boolean>(false);
-    
+    const [data, setData] = useState<Array<any>>([]);
+    const [search, setSearch] = useState('');
+    const [query, setQuery] = useState('');
+    const [currentpage, setCurrentPage] = useState(1);
 
-
-   
-
-    const fetchData = async () => {
+    const fetchData = async (searchParam = '') => {
         try {
-            const fetchedData = await databaseService.getType();
-            setData(fetchedData);
+            let result;
+            if (searchParam) {
+                const url = `/types?search=${searchParam}`;
+                const response = await axios.get(url);
+                result = response.data;
+            } else {
+                result = await databaseService.getType();
+            }
+            setData(result);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.log('Error fetching data:', error);
         }
     };
+
+    const refresh_type = () => {
+        try {
+            localStorage.setItem("flag_load", 'true');
+            fetchData();
+        } catch (error) {
+            console.error('Lỗi khi reset:', error);
+        }
+    }
+
+    if(ModalCreateNode() || getTableColumnsConfig({})) {
+        refresh_type();
+    }
+
     useEffect(() => {
-        fetchData();
+        // Lấy từ khóa tìm kiếm từ URL khi component mount
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('search');
+        if (searchParam) {
+            setSearch(searchParam);
+            setQuery(searchParam);
+            fetchData(searchParam);
+        } else {
+            fetchData();
+        }
+
+        // Lắng nghe sự kiện popstate
+        const handlePopState = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get('search');
+
+            if (searchParam) {
+                setSearch(searchParam);
+                setQuery(searchParam);
+                fetchData(searchParam);
+            } else {
+                setSearch('');
+                setQuery('');
+                fetchData();
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
     }, []);
-    
-    const handleSearch = (keyword: string) => {
-        const filteredResults = data.filter(item =>
-            item.name_type.toLowerCase().includes(keyword.toLowerCase())
-        );
-        setFilteredData(filteredResults);
-        setSearchError(filteredResults.length === 0);
+
+    const handleSearch = async () => {
+        setQuery(search);
+        const url = `/types?search=${search}`;
+        console.log(`Sending request to: ${url}`);
+        try {
+            // Thay đổi URL trong trình duyệt mà không làm tải lại trang
+            window.history.pushState({}, '', url);
+// Tiếp tục xử lý yêu cầu API như bình thường
+            const response = await axios.get(url);
+            setData(response.data);
+        } catch (error) {
+            console.error('Error searching:', error);
+        }
     };
 
-    const columns = getTableColumnsConfig({ data });
+    const filteredData = useMemo(() => {
+        return data.filter(item =>
+            item.name_type.toLowerCase().includes(query.toLowerCase())
+        );
+    }, [query, data]);
+
+    const columns = [
+        {
+            title: 'Id',
+            dataIndex: 'stt',
+            key: 'stt',
+            width: 50,
+            render: (text: string, record: any, index: number) => (currentpage - 1) * 10 + index + 1,
+        },
+        ...getTableColumnsConfig({ data })
+    ];
+
+    const handleTableChange = (pagination: any) => {
+        setCurrentPage(pagination.current);
+    };
 
     return (
         <div>
-            <ModalCreateNode />
-            <div className='mb-2'>
-                <a className=' text-black' onClick={() => window.location.href = '/nodes'} >
-                    <SwapLeftOutlined /> Nodes
+            <PageHeaderProvider extra={<ModalCreateNode />} />
+            <div className='flex items-center'>
+                <a className='text-black' onClick={() => window.location.href = '/nodes'}>
+                    <ArrowLeftOutlined /> Nodes
                 </a>
-            </div>              
-            <FilterComponent onSearch={handleSearch} />
-            {searchError && <div>No matching data found</div>}
-            <Table dataSource={filteredData.length > 0 ? filteredData : data} columns={columns} bordered />
-           
+                {/* <FilterComponent /> */}
+                <Form onFinish={handleSearch}>
+                    <div className="flex justify-end gap-3" style={{ marginLeft: 625 }}>
+                        <Form.Item className="w-[220px]">
+                            <Input placeholder="Enter keyword" value={search} onChange={e => setSearch(e.target.value)}></Input>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />}>
+                                Search
+                            </Button>
+                        </Form.Item>
+                    </div>
+                </Form>
+            </div>
+            <Table 
+                dataSource={filteredData} 
+                columns={columns} 
+                bordered 
+                pagination={{ pageSize: 10 }}
+                onChange={handleTableChange}
+                rowKey="id"
+            />
         </div>
     );
-    
 };
 
 export default TypeListingRoot;

@@ -35,13 +35,13 @@ export const ModalCreateReactFlow = () => {
         }
         const flag = await databaseService.createWorkflow(values.name,outputDateString,user,script)
         if(flag) {
-            message.success('Create new React flow instance successfully');
+            message.success('Create new react flow instance successfully');
             setOpen(false);
             queryClient.invalidateQueries({
                 queryKey: [QUERY_KEYS.WORKFLOWS]
             });
         } else {
-            message.error("Failed to create a new React flow instance");
+            message.error("Error");
             setOpen(false);
         }
         

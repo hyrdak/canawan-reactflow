@@ -14,8 +14,6 @@ import { LeftSidebar, RightSidebar } from 'components/common/react-flows/compone
 import { PageHeaderProvider } from 'components/core/page-header-provider';
 
 import { Actions } from './components/actions';
-import Flow from './components/react-flow';
-import SidebarDetail from './components/sidebar';
 
 import 'reactflow/dist/style.css';
 
@@ -85,9 +83,8 @@ const WorkflowDetail = () => {
                 extra={<Actions data={data?.data} onSave={() => setIsDirty(false)} />}
             />
             <div className="flex h-full">
-                <Flow/>
-                {/* {!!data?.data && <ContentDnDFlow data={data?.data} onChange={handleSetData} />} */}
-                
+                <LeftSidebar />
+                {!!data?.data && <ContentDnDFlow data={data?.data} onChange={handleSetData} />}
             </div>
             <div className="absolute right-0 translate-y-1/2 top-1/2">
                 <Button icon={<ArrowLeftOutlined />} title="Preview Json" onClick={() => setOpenDraw(true)} />

@@ -22,10 +22,10 @@ const databaseService = {
   //table
   async getNodes() {
     try {
-        console.log("Khởi chạy getNodes");
-        const response = await axiosInstance.get('Nodes');
+      console.log("Khởi chạy getNodes");
+      const response = await axiosInstance.get('Nodes');
 
-        return response.data;
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -33,10 +33,10 @@ const databaseService = {
   },
   async getType() {
     try {
-        console.log("Khởi chạy getType");
-        const response = await axiosInstance.get('/Type');
+      console.log("Khởi chạy getType");
+      const response = await axiosInstance.get('/Type');
 
-        return response.data;
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -44,10 +44,10 @@ const databaseService = {
   },
   async getKind() {
     try {
-        console.log("Khởi chạy getKind");
-        const response = await axiosInstance.get('/Kind');
+      console.log("Khởi chạy getKind");
+      const response = await axiosInstance.get('/Kind');
 
-        return response.data;
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -55,10 +55,10 @@ const databaseService = {
   },
   async getJsonOptions() {
     try {
-        console.log("Khởi chạy getJsonOptions");
-        const response = await axiosInstance.get('/JsonOptions');
+      console.log("Khởi chạy getJsonOptions");
+      const response = await axiosInstance.get('/JsonOptions');
 
-        return response.data;
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -66,10 +66,10 @@ const databaseService = {
   },
   async getWorkflows(isFetching: boolean = true) {
     try {
-        console.log("Khởi chạy getWorkflows");
-        const response = await axiosInstance.get('/Workflows');
-        
-        return response.data;
+      console.log("Khởi chạy getWorkflows");
+      const response = await axiosInstance.get('/Workflows');
+
+      return response.data;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -81,7 +81,6 @@ const databaseService = {
     try {
       const response = await axiosInstance.post('rpc/getnodes');
       if (response) {
-        
         return response.data;
       } else {
         console.error('Error:', response);
@@ -90,15 +89,15 @@ const databaseService = {
       console.error('Error:', error);
     }
   },
-  
+
   //getNodeByID
   async getNodeByID(id: any) {
     try {
-      const response = await axiosInstance.post('rpc/getnodesbyid',{id: id});
+      const response = await axiosInstance.post('rpc/getnodesbyid', { id: id });
       console.log(response)
-      
+
       if (response) {
-        
+
         return response.data;
       } else {
         console.error('Error:', response);
@@ -111,10 +110,10 @@ const databaseService = {
   //deleteNodeByID
   async deleteNodeByID(id: any) {
     try {
-      const response = await axiosInstance.post('rpc/deletenodesbyid',{e: id});
+      const response = await axiosInstance.post('rpc/deletenodesbyid', { e: id });
       console.log(this.deleteJsonOptionsByID(id));
       if (response) {
-        
+
         return response;
       } else {
         console.error('Error:', response);
@@ -122,14 +121,15 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
+
   },
 
   //deleteNodeByID
   async deleteJsonOptionsByID(id: any) {
     try {
-      const response = await axiosInstance.post('rpc/deleteoptionbyid',{e: id});
+      const response = await axiosInstance.post('rpc/deleteoptionbyid', { e: id });
       if (response) {
-        
+
         return response.data;
       } else {
         console.error('Error:', response);
@@ -142,9 +142,9 @@ const databaseService = {
   //getKindByID
   async getKindByID(id: any) {
     try {
-      const response = await axiosInstance.post('rpc/getkindbyid',{e: id});
+      const response = await axiosInstance.post('rpc/getkindbyid', { e: id });
       if (response) {
-        
+
         return response.data;
       } else {
         console.error('Error:', response);
@@ -157,9 +157,9 @@ const databaseService = {
   //getTypeByID
   async getTypeByID(id: any) {
     try {
-      const response = await axiosInstance.post('rpc/getnodesbyid',{e: id});
+      const response = await axiosInstance.post('rpc/getnodesbyid', { e: id });
       if (response) {
-        
+
         return response.data;
       } else {
         console.error('Error:', response);
@@ -170,7 +170,7 @@ const databaseService = {
   },
 
   //add Node
-  async addNode(name:any, id_kind:any, id_type:any, json_option:any) {
+  async addNode(name: any, id_kind: any, id_type: any, json_option: any) {
     try {
       const response = await axiosInstance.post('Nodes', {
         name: name, id_kind: id_kind, id_type: id_type
@@ -182,25 +182,50 @@ const databaseService = {
     }
     try {
       const response = await axiosInstance.post('JsonOptions', {
-        name_jsonoptions : json_option
+        name_jsonoptions: json_option
       });
     } catch (error) {
       console.error('Error:', error);
-      
+
       return false;
     }
-    
+
+    return true;
+  },
+  updateNode: async (id: number, name: any, id_kind: any, id_type: any, json_option: any) => {
+    try {
+      const response = await axiosInstance.patch('Nodes?id=eq.' + id, { id_kind: id_kind, id_type: id_type, name: name });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    try {
+      const response = await axiosInstance.patch('JsonOptions?id=eq.' + id, { name_jsonoptions: json_option });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
     return true;
   },
 
   //add kind
-  async addKind(name_kind:any) {
+  async addKind(name_kind: any) {
     try {
       const response = await axiosInstance.post('Kind', {
         name_kind: name_kind
       });
       if (response) {
-        
         return response;
       } else {
         console.error('Error:', response);
@@ -211,13 +236,13 @@ const databaseService = {
   },
 
   //create workflow 
-  async createWorkflow(name:any, createdAt:any, userId:any, script:any) {
+  async createWorkflow(name: any, createdAt: any, userId: any, script: any) {
     try {
       const response = await axiosInstance.post('Workflows', {
         name: name, createdAt: createdAt, userId: userId, script: script
       });
       if (response) {
-        
+
         return response;
       } else {
         console.error('Error:', response);
@@ -228,11 +253,11 @@ const databaseService = {
   },
 
   //delete workflow
-  async deleteWorkflow(id:any) {
+  async deleteWorkflow(id: any) {
     try {
-      const response = await axiosInstance.post('Workflows?id=eq.'+id);
+      const response = await axiosInstance.post('Workflows?id=eq.' + id);
       if (response) {
-        
+
         return response;
       } else {
         console.error('Error:', response);
@@ -240,15 +265,15 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
-    
+
     return true;
   },
   //update kind
-  async updateKind(id:string,name_kind:string) {
+  async updateKind(id: string, name_kind: string) {
     try {
-      const response = await axiosInstance.post('Kind?id=eq.'+id,{name_kind: name_kind});
+      const response = await axiosInstance.post('Kind?id=eq.' + id, { name_kind: name_kind });
       if (response) {
-        
+
         return response;
       } else {
         console.error('Error:', response);
@@ -256,16 +281,16 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
-      
+
     return true;
-},
+  },
   //
   //delete kind
-  async deleteKind(id:any) {
+  async deleteKind(id: any) {
     try {
-      const response = await axiosInstance.post('Kind?id=eq.'+id);
+      const response = await axiosInstance.post('Kind?id=eq.' + id);
       if (response) {
-        
+
         return response;
       } else {
         console.error('Error:', response);
@@ -273,7 +298,7 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
-    
+
     return true;
   },
   //getElementType
@@ -289,13 +314,12 @@ const databaseService = {
     }
   },
   //add type 
-  async addType(name_type:any) {
+  async addType(name_type: any) {
     try {
       const response = await axiosInstance.post('Type', {
         name_type: name_type
       });
       if (response) {
-        
         return response;
       } else {
         console.error('Error:', response);
@@ -303,39 +327,39 @@ const databaseService = {
     } catch (error) {
       console.error('Error:', error);
     }
-    
+
     return true;
   },
-//update type name_type: newName
-async  editType(id: string, newName: string) {
-  try {
-    const response = await axiosInstance.post('Type?id=eq.'+id,{name_type: newName});
-    if (response) {
-      
-      return response;
-    } else {
-      console.error('Error:', response);
+  //update type name_type: newName
+  async editType(id: string, newName: string) {
+    try {
+      const response = await axiosInstance.post('Type?id=eq.' + id, { name_type: newName });
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-},
-//delete type
-async deleteType(id:any) {
-  try {
-    const response = await axiosInstance.post('Type?id=eq.'+id);
-    if (response) {
-      
-      return response;
-    } else {
-      console.error('Error:', response);
+  },
+  //delete type
+  async deleteType(id: any) {
+    try {
+      const response = await axiosInstance.post('Type?id=eq.' + id);
+      if (response) {
+
+        return response;
+      } else {
+        console.error('Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-  
-  return true;
-},
+
+    return true;
+  },
 
 
   //user
@@ -360,16 +384,16 @@ async deleteType(id:any) {
   //       email: email,
   //       password: password,
   //     });
-  
+
   //     if (error) {
   //       console.error('Login error:', error.message);
   //       throw new Error('Login failed');
   //     }
-  
+
   //     // Retrieve the current user and session
   //     const currentUser = supabase.auth.user();
   //     const currentSession = supabase.auth.session();
-  
+
   //     if (currentUser && currentSession) {
   //       localStorage.setItem('access_token', currentSession.access_token);
   //       localStorage.setItem('refresh_token', currentSession.refresh_token);

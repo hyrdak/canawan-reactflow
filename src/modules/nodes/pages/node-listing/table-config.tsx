@@ -1,33 +1,14 @@
-import { useState } from 'react';
 import ReactJson from 'react-json-view';
-import databaseService from 'databaseService';
 
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, message, Popconfirm } from 'antd';
-import cloneDeep from 'lodash/cloneDeep';
+import { Popover } from 'antd';
 
-import ModalEditNode from './components/Edit-nodes-modal';
+import ButtonDelete from './components/button-delete-node'
+import ModalCreateNode from './components/Create-edit-nodes-modal';
 
-const GetTableColumnsConfig = () => {
-    const [flag, setFlag] = useState(false);
-    const [currentRecord, setCurrentRecord] = useState(-1);
-    async function handleEdit(e:any) {
-        if(e == currentRecord) {
-            await setFlag(false);
-            setFlag(true);
-            setCurrentRecord(e);
-        } else {
-            setFlag(true);
-            setCurrentRecord(e);
-        }
-    }
-    async function handleDelete(id: any) {
-        if(await databaseService.deleteNodeByID(id)) {
-            message.success('Xóa thành công!');
-        }
-    }
 
-    //row
+interface GetTableColumnsConfigProps { }
+
+export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
     const columnConfig: any[] = [
         {
             title: '#',
@@ -77,38 +58,23 @@ const GetTableColumnsConfig = () => {
             }
         },
         {
-          title: 'Actions',
-          key: 'actions',
-          width: 180,
-          render: (text: string, record: any) => (
-            <span>
-                <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={()=>{handleEdit(record.id)}}></Button>
-              {/* <ModalEditNode json={cloneDeep(record)} jsonLog={cloneDeep(record)} /> */}
-                {(flag && currentRecord==record.id)?(
-                    <>
-                    <ModalEditNode
-                        json={cloneDeep(record)}
-                        jsonLog={cloneDeep(record)}
-                    /></>
-                ):''}
-              <Popconfirm
-                title="Are you sure to delete this type?"
-                onConfirm={() => handleDelete(record.id)}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button type="primary" danger icon={<DeleteOutlined />}></Button>
-              </Popconfirm>
-              {/* Modal */}
-            </span>
-          ),
+            title: 'Actions',
+            key: 'actions',
+            width: 101,
+            render: (text: string, record: any) => (
+                <Popover
+                    placement="bottom"
+                    trigger="click"
+                >
+                    <div className="flex gap-2">
+                        <ModalCreateNode record={record} />
+                        <ButtonDelete data={record} />
+                    </div>
+                </Popover>
+            ),
         },
     ];
 
     return columnConfig;
 };
-export default GetTableColumnsConfig;
-
-
-
-
+export default getTableColumnsConfig;

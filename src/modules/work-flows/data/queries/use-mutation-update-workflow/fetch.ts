@@ -7,8 +7,8 @@ import { UpdateWorkflowParams, UpdateWorkflowResponseData } from './interfaces'
 const updateWorkflow = async (
   params: UpdateWorkflowParams,
 ): Promise<FetcherResponse<UpdateWorkflowResponseData>> => {
-  
-  const  {data: responseData} = await axiosInstance.patch<FetcherResponse<UpdateWorkflowResponseData>>('/rest/v1/flows?id=eq.'+params.id, params)
+
+  const { data: responseData } = await axiosInstance.patch<FetcherResponse<UpdateWorkflowResponseData>>('/rest/v1/Workflows?id=eq.' + params.id, params)
 
 
   return responseData

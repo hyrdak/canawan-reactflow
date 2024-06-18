@@ -5,7 +5,7 @@ import { WorkflowDetailRequest, WorkflowDetailResponse } from './interfaces';
 
 const getWorkflowDetail = async (params: WorkflowDetailRequest): Promise<FetcherResponse<WorkflowDetailResponse[]>> => {
     const { data: responseData } = await axiosInstance.get<FetcherResponse<WorkflowDetailResponse[]>>(
-        '/rest/v1/flows',
+        '/rest/v1/Workflows',
         {
             params: {
                 ...params,

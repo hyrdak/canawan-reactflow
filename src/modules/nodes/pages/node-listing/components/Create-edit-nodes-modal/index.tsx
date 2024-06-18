@@ -5,6 +5,8 @@ import { CloseOutlined, EditOutlined, MinusCircleOutlined, PlusOutlined } from '
 import { useQueryClient } from '@tanstack/react-query';
 import { AutoComplete, Button, Card, Form, Input, message, Modal, Select, Space, Typography } from 'antd';
 
+import { useMutationCreateNode } from 'modules/nodes/data/use-mutation-create-node'
+
 import databaseService from '../../../../../../databaseService';
 
 interface DataType {
@@ -57,15 +59,18 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
 
     const queryClient = useQueryClient();
+    const mutationCreateNode = useMutationCreateNode();
+    const loading = mutationCreateNode.isPending;
+
     useEffect(() => {
         const fetchData = async () => {
             setDataType(await databaseService.getType());
             setDataKind(await databaseService.getKind());
             setDataElementType(await databaseService.getElementType());
-
         };
         fetchData();
     }, []);
+
 
     if (record) {
         form.setFieldsValue({
@@ -85,7 +90,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             })
         });
     }
-
     // function fetchDataProps() {
     //     if (record) {
     //         record.name_jsonoptions.map((item: any) => {
@@ -116,7 +120,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     //         }
     //     });
     // };
-
     const afterClose = () => {
         if (!record) {
             form.resetFields();
@@ -220,6 +223,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             <Modal
                 open={open}
                 title={record ? 'Edit node instance' : 'Create new node instance'}
+                confirmLoading={loading}
                 onCancel={() => setOpen(false)}
                 onOk={() => form.submit()}
                 style={{ minWidth: '80%', maxWidth: '90%' }}

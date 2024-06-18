@@ -34,59 +34,59 @@ const SignIn: React.FC<Props> = ({ supabase }) => {
   const signin_action = async () => {
     if (!email && !password) {
       toast.error('Vui lòng nhập email và mật khẩu');
-      
-return;
+
+      return;
     }
     if (!email) {
       toast.error('Vui lòng nhập email');
-      
-return;
+
+      return;
     }
     if (!password) {
       toast.error('Vui lòng nhập mật khẩu');
-      
-return;
+
+      return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error('Email không đúng định dạng');
-      
-return;
+
+      return;
     }
     if (password.length < 6) {
       toast.error('Mật khẩu phải có ít nhất 6 ký tự');
-      
-return;
+
+      return;
     }
     if (!emailRegex.test(email) && password.length < 6) {
       toast.error('Vui lòng nhập đúng định dạng email và mật khẩu');
-      
-return;
-    }
-try {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  });
 
-  if (error) {
-    console.error('Error:', error.message);
-    toast.error('Tên đăng nhập hoặc mật khẩu không đúng.');
-  } else {
-    toast.success('Đăng nhập thành công!');
-    window.location.href = '/nodes';
-  }
-} catch (error) {
-  console.error('Error:', (error as Error).message);
-  toast.error('Đã xảy ra lỗi trong quá trình đăng nhập.');
-} finally {
-  setLoading(false); // Kết thúc quá trình đăng nhập, đặt trạng thái loading thành false
-}
+      return;
+    }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        console.error('Error:', error.message);
+        toast.error('Tên đăng nhập hoặc mật khẩu không đúng.');
+      } else {
+        toast.success('Đăng nhập thành công!');
+        window.location.href = '/work-flows';
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+      toast.error('Đã xảy ra lỗi trong quá trình đăng nhập.');
+    } finally {
+      setLoading(false); // Kết thúc quá trình đăng nhập, đặt trạng thái loading thành false
+    }
   };
-  
-return (
+
+  return (
     <div className="absolute inset-0 bg-gradient-to-tl from-purple-600 to-cyan-400 flex items-center justify-center">
       <ToastContainer
         position="top-center"
@@ -101,7 +101,7 @@ return (
       />
       <div className="w-full max-w-md bg-white rounded-lg shadow-md dark:border dark:border-gray-700 p-6 space-y-4">
         <h1 className="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
-Đăng nhập
+          Đăng nhập
         </h1>
         <form className="space-y-4" action="#" onSubmit={(e) => { e.preventDefault(); signin_action(); }}>
           <div>
@@ -149,12 +149,12 @@ return (
           <Link to="/sign-up" className="text-blue-700"> Đăng ký ngay</Link>
         </p>
       </div>
-      
-     
-      
+
+
+
       <ToastContainer position="top-center" />
     </div>
-    
+
   );
 };
 

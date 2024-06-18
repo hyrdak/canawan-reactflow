@@ -18,12 +18,8 @@ const ButtonDelete = ({ data }: Props) => {
             title: '',
             type: 'warning',
             content: 'Are you sure to delete this item?',
-            okText: 'OK',
+            okText: 'Ok',
             cancelText: 'Cancel',
-            onCancel(...args) {
-                console.log('delete');
-
-            },
             onOk() {
                 return mutationDeleteN.mutateAsync(data.id, {
                     onSuccess: (response: any) => {

@@ -34,9 +34,9 @@ export const RightSidebar = () => {
                                 <b>Data Compile:</b>
                             </h3>
                             <ReactJson
-                            displayDataTypes={false}
-                            name={null}
-                            collapsed
+                                displayDataTypes={false}
+                                name={null}
+                                collapsed
                                 src={{
                                     ...reactFlowSelected,
                                     script: {

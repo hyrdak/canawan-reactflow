@@ -1,7 +1,26 @@
 {
-    "editor.formatOnSave": true,
-    "notebook.formatOnSave.enabled": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "always"
-      },
+  "files.autoSave": "afterDelay",
+  "workbench.editor.enablePreview": false,
+  "extensions.autoUpdate": false,
+  "editor.renderWhitespace": "none",
+  "editor.minimap.enabled": false,
+  "files.associations": {
+    "*.log": "log"
+  },
+  "typescript.tsserver.log": "off",
+  "javascript.suggest.autoImports": false,
+  "editor.suggest.showIcons": false,
+  "breadcrumbs.enabled": false,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggestOnTriggerCharacters": false,
+  "workbench.statusBar.visible": false,
+  "editor.codeLens": false,
+  "editor.semanticHighlighting.enabled": false,
+  "extensionHost.launchArgs": [
+    "--max-old-space-size=512"
+  ]
 }

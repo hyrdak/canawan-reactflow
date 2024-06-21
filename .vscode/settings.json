@@ -1,6 +1,6 @@
 {
-  "files.autoSave": "afterDelay",
-  "workbench.editor.enablePreview": false,
+  "files.autoSave": "off",
+  "workbench.editor.enablePreview": true,
   "extensions.autoUpdate": false,
   "editor.renderWhitespace": "none",
   "editor.minimap.enabled": false,

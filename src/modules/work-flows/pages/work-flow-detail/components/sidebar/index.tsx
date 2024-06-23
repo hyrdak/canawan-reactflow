@@ -144,7 +144,7 @@ const SidebarDetail: React.FC = () => {
   }
 
   return (
-    <div style={{ width: collapsed ? 80 : 230 }}>
+    <div style={{width: collapsed ? 90 : 240, height: '85vh', overflowY: 'auto' }}>
       <Menu
         className="border-b border-l rounded"
         defaultOpenKeys={arrayKey}

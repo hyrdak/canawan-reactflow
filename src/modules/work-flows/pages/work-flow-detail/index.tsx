@@ -85,9 +85,9 @@ const WorkflowDetail = () => {
                 extra={<Actions data={data?.data} onSave={() => setIsDirty(false)} />}
             />
             <div className="flex h-full">
-                <Flow/>
+                <SidebarDetail />
+                {!!data?.data && <Flow data={data?.data} onChange={handleSetData} />}
                 {/* {!!data?.data && <ContentDnDFlow data={data?.data} onChange={handleSetData} />} */}
-                
             </div>
             <div className="absolute right-0 translate-y-1/2 top-1/2">
                 <Button icon={<ArrowLeftOutlined />} title="Preview Json" onClick={() => setOpenDraw(true)} />

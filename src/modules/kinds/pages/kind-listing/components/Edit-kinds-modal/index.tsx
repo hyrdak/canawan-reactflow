@@ -58,7 +58,7 @@ return (
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
-                title="Chỉnh sửa tên loại"
+                title="Chỉnh sửa tên Loại"
                 destroyOnClose
                 onCancel={handleCancel}
                 onOk={handleSubmit}

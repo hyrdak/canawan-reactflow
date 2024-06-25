@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-import { createClient,SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://ismbrwqkcootieaguzwa.supabase.co';
 const supabaseAPIUrl = 'https://ismbrwqkcootieaguzwa.supabase.co/rest/v1/';
 const supabaseAPIKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzbWJyd3FrY29vdGllYWd1endhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NTQyNDcsImV4cCI6MjAyODEzMDI0N30.fEo-ddluC6l2HNPqIjcHBFHTYdIWoE8vjfjIX9KPbPI';
 
-const supabase : SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
+const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
 
 const axiosInstance = axios.create({
   baseURL: supabaseAPIUrl,
@@ -192,28 +192,22 @@ const databaseService = {
 
     return true;
   },
-  updateNode: async (id: number, name: any, id_kind: any, id_type: any, json_option: any) => {
+  updateNode: async (id: number, name: any, id_kind: any, id_type: any, json_option: object) => {
     try {
       const response = await axiosInstance.patch('Nodes?id=eq.' + id, { id_kind: id_kind, id_type: id_type, name: name });
-      if (response) {
 
-        return response;
-      } else {
-        console.error('Error:', response);
-      }
     } catch (error) {
       console.error('Error:', error);
+
+      return false;
     }
     try {
       const response = await axiosInstance.patch('JsonOptions?id=eq.' + id, { name_jsonoptions: json_option });
-      if (response) {
 
-        return response;
-      } else {
-        console.error('Error:', response);
-      }
     } catch (error) {
       console.error('Error:', error);
+
+      return false;
     }
 
     return true;
@@ -398,53 +392,53 @@ const databaseService = {
   //       localStorage.setItem('access_token', currentSession.access_token);
   //       localStorage.setItem('refresh_token', currentSession.refresh_token);
   //     }
-    // } catch (error) {
-    //   console.error('Login error:', error.message);
-    //   throw new Error('Login failed');
-    // } 
+  // } catch (error) {
+  //   console.error('Login error:', error.message);
+  //   throw new Error('Login failed');
+  // } 
   async sign_up(supabase: any, email: any, password: any) {
     try {
-        const { error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-        });
-        if (error) {
-            if (error.message.includes('already registered')) {
-                return { success: false, message: 'Email đã được sử dụng. Vui lòng chọn email khác.' };
-            } else {
-                return { success: false, message: `Lỗi đăng ký: ${error.message}` };
-            }
+      const { error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+      if (error) {
+        if (error.message.includes('already registered')) {
+          return { success: false, message: 'Email đã được sử dụng. Vui lòng chọn email khác.' };
+        } else {
+          return { success: false, message: `Lỗi đăng ký: ${error.message}` };
         }
-        
-return { success: true, message: 'Đăng ký thành công' };
-    } catch (error: any) {
-        return { success: false, message: `Lỗi đăng ký: ${error.message}` };
-    }
-},
-
-
-
- 
-    async sign_out(supabase: SupabaseClient, toast: any, redirectPath: string) {
-      try {
-          const { error } = await supabase.auth.signOut();
-          if (error) {
-              console.error('Error:', error.message);
-              toast.error('Đăng xuất thất bại');
-          } else {
-              localStorage.removeItem('token');
-              toast.success('Đăng xuất thành công');
-              if (redirectPath) {
-                  window.location.href = redirectPath;
-              }
-          }
-      } catch (error) {
-          console.error('Error:', (error as Error).message);
-          toast.error('Đăng xuất thất bại');
       }
+
+      return { success: true, message: 'Đăng ký thành công' };
+    } catch (error: any) {
+      return { success: false, message: `Lỗi đăng ký: ${error.message}` };
+    }
+  },
+
+
+
+
+  async sign_out(supabase: SupabaseClient, toast: any, redirectPath: string) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error:', error.message);
+        toast.error('Đăng xuất thất bại');
+      } else {
+        localStorage.removeItem('token');
+        toast.success('Đăng xuất thành công');
+        if (redirectPath) {
+          window.location.href = redirectPath;
+        }
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+      toast.error('Đăng xuất thất bại');
+    }
   }
-  
- 
+
+
 
 };
 

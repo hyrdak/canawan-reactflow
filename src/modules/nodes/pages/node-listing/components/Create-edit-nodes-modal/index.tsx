@@ -90,36 +90,7 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             })
         });
     }
-    // function fetchDataProps() {
-    //     if (record) {
-    //         record.name_jsonoptions.map((item: any) => {
-    //             if (item.props[0] === undefined) {
-    //                 item.props = Object.entries(item.props).map(([propName, propValue]) => ({
-    //                     propName,
-    //                     propValue: propValue
-    //                 }));
-    //             }
-    //         });
-    //     }
-    // }
-    // useEffect(() => {
-    //     if (open && record) {
-    //         const currentElementType = record.name_jsonoptions[0]?.elementType; // Assuming you're using the first json option's elementType to determine the props
-    //         handleChangeEType(currentElementType);
-    //     }
-    // }, [open, record]);
 
-    // const handleChangeEType = (value: string) => {
-    //     dataElementType.map((item) => {
-    //         if (value === item.name_elementType) {
-    //             setOptions([]);
-    //             item.props.map((itemprops: any) => {
-    //                 setOptions(prevOptions => [...prevOptions, { value: itemprops.name }]);
-    //             })
-    //             setCheckedProps(item.props);
-    //         }
-    //     });
-    // };
     const afterClose = () => {
         if (!record) {
             form.resetFields();
@@ -133,7 +104,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             });
         }
     };
-
     const handleChangeEType = (value: string) => {
         dataElementType.forEach((item) => {
             if (value === item.name_elementType) {
@@ -143,7 +113,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             }
         });
     };
-
 
     const HandleEditCreateNodes = async (value: any) => {
 
@@ -158,8 +127,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                 }
                 value.type = selectedType.id;
             }
-            const selectedJson = record.name_jsonoptions
-            console.log(selectedJson);
             if (record.name_kind == value.kind) {
                 const selectedKind = dataKind.find((kind) => kind.name_kind === value.kind);
                 if (!selectedKind) {
@@ -171,22 +138,30 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
             }
         }
 
-        const updatedJson = value.jsons.map((field: Field) => {
-            const newProps: { [key: string]: string } = {};
-            if (Array.isArray(field.props)) {
-                field.props.forEach((prop: Props) => {
-                    newProps[prop.propName] = prop.propValue;
-                });
-            }
-            const propsCheck = field.propsCheck || {};
-            const combinedProps = { ...propsCheck, ...newProps };
-            const { propsCheck: ignored, ...restOfField } = field;
+        let updatedJson: any[] = []
+        if (value.jsons !== undefined) {
+            const updatedJsons = value.jsons.map((field: Field) => {
+                const newProps: { [key: string]: string } = {};
+                if (Array.isArray(field.props)) {
+                    field.props.forEach((prop: Props) => {
+                        newProps[prop.propName] = prop.propValue;
+                    });
+                }
+                const propsCheck = field.propsCheck || {};
+                const combinedProps = { ...propsCheck, ...newProps };
+                const { propsCheck: ignored, ...restOfField } = field;
 
-            return {
-                ...restOfField,
-                props: combinedProps,
-            };
-        });
+                return {
+                    ...restOfField,
+                    props: combinedProps,
+                };
+            });
+            updatedJson = updatedJsons
+
+        }
+        else {
+            updatedJson = []
+        }
         debugger
         if (record) {
             const success = await databaseService.updateNode(record.id, value.name, value.kind, value.type, updatedJson);
@@ -367,8 +342,6 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                 <Form.List name={[field.name, 'props']}>
                                                     {(nestedFields, { add: addNested, remove: removeNested }) => (
                                                         <>
-
-
                                                             {nestedFields.map((nestedField) => (
                                                                 <Space key={nestedField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
 

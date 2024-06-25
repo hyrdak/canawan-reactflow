@@ -43,7 +43,7 @@ function PageHeader({ sidebarConfig }: PageHeaderProps): JSX.Element {
             setPageMetadata({
                 pathname,
                 data: {
-                    title: menuItemSelected?.pageTitle ?? menuItemSelected?.label ?? 'Browser Automated',
+                    title: menuItemSelected?.pageTitle ?? menuItemSelected?.label ?? 'Types',
                     headerTitle: menuItemSelected?.pageTitle ?? menuItemSelected?.label
                 }
             })

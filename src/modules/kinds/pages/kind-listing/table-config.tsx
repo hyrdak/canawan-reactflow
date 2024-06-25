@@ -21,14 +21,6 @@ async function handleDelete(id: any) {
 }
 export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
     const columnConfig: any[] = [
-        // {
-        //     title: 'Id',
-        //     key: 'id',
-        //     dataIndex: 'id',
-        //     width: 50,
-        //     align: 'center',
-        //     render: (_id: any, _record: any, index: number) => <span className="capitalize">{index+1}</span>
-        // },
         {
             title: 'Kind',
             key: 'name_kind',

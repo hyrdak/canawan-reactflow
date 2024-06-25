@@ -18,20 +18,29 @@ const SidebarDetail: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState<Array<any>>();
   const [dataItem, setDataItem] = useState<Array<any>>([]);
-  
+  console.log(data);
+
   const getListNodes = async () => {
     const nodes = await databaseService.getDataNodeList();
     setData(nodes);
   }
-  
+
+  const onDragStart = (event: any, data: any) => {
+    event.dataTransfer.setData('application/reactflow', JSON.stringify(data));
+    event.dataTransfer.effectAllowed = 'move';
+  };
+
   useEffect(() => {
     getListNodes();
   }, []);
-  useEffect(() => {
-    if(data){fetchSidebar();}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data,collapsed]);
   
+  useEffect(() => {
+    if (data) {
+      fetchSidebar();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, collapsed]);
+
   const fetchSidebar = () => {
     setDataItem([]);
     // Tạo mảng mới từ nodes để thêm vào sidebar
@@ -45,32 +54,80 @@ const SidebarDetail: React.FC = () => {
 
       return acc;
     }, {});
+
     const newArray: MenuItem[] = [
       {
         key: '',
         icon: collapsed ? <MenuUnfoldOutlined /> : <Input placeholder="Search keyword" style={{ width: 150, textAlign: 'left' }} />,
         label: collapsed ? '' : <MenuFoldOutlined style={{ fontSize: 20, marginTop: 12, marginRight: 20 }} onClick={handleMenuToggle} />,
-        onClick: collapsed ? handleMenuToggle : ()=>{},
+        onClick: collapsed ? handleMenuToggle : () => { },
       }
     ];
     let count = 1;
-    Object.keys(groupedData).map((kind,i) => {
-      if(groupedData[kind].length === 1) {
-        arrayKey.push(count+"");
+    Object.keys(groupedData).map((kind, i) => {
+      if (groupedData[kind].length === 1) {
+        arrayKey.push(count + "");
         newArray.push({
           key: count++,
           label: collapsed ? kind[0] : <div style={{ fontSize: 16 }}>{kind}</div>,
           icon: collapsed ? '' : <AppstoreOutlined />,
           children: [
-            { key: count++, label: collapsed ? <Button type="dashed" style={{ fontSize: 15, padding:19 }} ><LinkOutlined /><div>{groupedData[kind][0]}</div></Button> : <Button type="dashed" style={{ fontSize: 15, marginTop: 2, width: 156, padding:19 }} ><LinkOutlined /><div>{groupedData[kind][0]}</div></Button> }
+            {
+              key: count++,
+              label: collapsed ? (
+                <Button
+                  block
+                  size="large"
+                  draggable
+                  className="w-full"
+                  onDragStart={(event) => onDragStart(event, groupedData[kind][0])}
+                >
+                  {groupedData[kind][0]}
+                </Button>
+              ) : (
+                <Button
+                  block
+                  size="large"
+                  draggable
+                  className="w-full"
+                  onDragStart={(event) => onDragStart(event, groupedData[kind][0])}
+                >
+                  {groupedData[kind][0]}
+                </Button>
+              )
+            }
           ],
         });
       } else {
-        arrayKey.push(count+"");
-        const child=()=>{
-          const a: { key: number; label: JSX.Element; }[]=[];
-          groupedData[kind].map((item:any,index:any) => {
-            a.push({ key: count++, label: collapsed ? <Button type="dashed" style={{ fontSize: 15, padding:19 }} ><LinkOutlined /><div>{item}</div></Button> : <Button type="dashed" style={{ fontSize: 15, marginTop: 3, width: 156, padding:19 }} ><LinkOutlined /><div>{item}</div></Button> });
+        arrayKey.push(count + "");
+        const child = () => {
+          const a: { key: number; label: JSX.Element; }[] = [];
+          groupedData[kind].map((item: any, index: any) => {
+            a.push({
+              key: count++,
+              label: collapsed ? (
+                <Button
+                  type="dashed"
+                  block
+                  size="large"
+                  draggable
+                  className="w-full"
+                  onDragStart={(event) => onDragStart(event, item)}
+                >
+                  {item}
+                </Button>
+              ) : (
+                <Button
+                  block
+                  size="large"
+                  draggable
+                  className="w-full"
+                  onDragStart={(event) => onDragStart(event, item)}
+                >
+                  {item}
+                </Button>
+              )
+            });
           });
           
           return a;
@@ -82,19 +139,19 @@ const SidebarDetail: React.FC = () => {
           children: child()
         });
       }
-    })
+    });
     setDataItem(newArray);
   }
-  
+
   return (
-    <div style={{ width: collapsed ? 80 : 230 }}>
+    <div style={{width: collapsed ? 90 : 240, height: '85vh', overflowY: 'auto' }}>
       <Menu
         className="border-b border-l rounded"
         defaultOpenKeys={arrayKey}
         mode="inline"
         inlineCollapsed={collapsed}
         items={dataItem}
-        />
+      />
     </div>
   );
 };

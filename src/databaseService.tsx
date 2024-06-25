@@ -263,12 +263,21 @@ const databaseService = {
     return true;
   },
   //update kind
+<<<<<<< HEAD
   async updateKind(id: string, name_kind: string) {
     try {
       const response = await axiosInstance.post('Kind?id=eq.' + id, { name_kind: name_kind });
       if (response) {
 
         return response;
+=======
+  async updateKind(id:any,name_kind:string) {
+    try {
+      const response = await axiosInstance.patch('Kind?id=eq.'+id,{name_kind: name_kind});
+      if (response) {
+        
+        return true;
+>>>>>>> 4bb149ec59587c4ebcf3b30276805579b62c7b6a
       } else {
         console.error('Error:', response);
       }
@@ -282,7 +291,11 @@ const databaseService = {
   //delete kind
   async deleteKind(id: any) {
     try {
+<<<<<<< HEAD
       const response = await axiosInstance.post('Kind?id=eq.' + id);
+=======
+      const response = await axiosInstance.delete('Kind?id=eq.'+id);
+>>>>>>> 4bb149ec59587c4ebcf3b30276805579b62c7b6a
       if (response) {
 
         return response;
@@ -324,6 +337,7 @@ const databaseService = {
 
     return true;
   },
+<<<<<<< HEAD
   //update type name_type: newName
   async editType(id: string, newName: string) {
     try {
@@ -350,6 +364,31 @@ const databaseService = {
       }
     } catch (error) {
       console.error('Error:', error);
+=======
+//update type name_type: newName
+async  editType(id: string, newName: string) {
+  try {
+    const response = await axiosInstance.patch('Type?id=eq.'+id,{name_type: newName});
+    if (response) {
+      
+      return response;
+    } else {
+      console.error('Error:', response);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+},
+//delete type
+async deleteType(id:any) {
+  try {
+    const response = await axiosInstance.delete('Type?id=eq.'+id);
+    if (response) {
+      
+      return response;
+    } else {
+      console.error('Error:', response);
+>>>>>>> 4bb149ec59587c4ebcf3b30276805579b62c7b6a
     }
 
     return true;

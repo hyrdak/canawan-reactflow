@@ -112,12 +112,6 @@ const databaseService = {
     try {
       const response = await axiosInstance.post('rpc/deletenodesbyid', { e: id });
       console.log(this.deleteJsonOptionsByID(id));
-      if (response) {
-
-        return response;
-      } else {
-        console.error('Error:', response);
-      }
     } catch (error) {
       console.error('Error:', error);
     }

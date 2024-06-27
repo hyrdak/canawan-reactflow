@@ -30,7 +30,8 @@ interface DataJson {
 }
 
 interface DataProps {
-    value: string;
+    label: string;
+    value: number;
 }
 
 interface Props {
@@ -55,7 +56,8 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [dataKind, setDataKind] = useState<DataKind[]>([]);
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
-    const [options, setOptions] = useState<DataProps[]>([]);
+    const [selectedElementTypeId, setSelectedElementTypeId] = useState<number | null>(null);
+    const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
 
     const queryClient = useQueryClient();
@@ -95,24 +97,30 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
         if (!record) {
             form.resetFields();
         }
-        else {
-            form.setFieldsValue({
-                name: record.name,
-                type: record.name_type,
-                kind: record.name_kind,
-                jsons: record.name_jsonoptions,
-            });
-        }
+
     };
-    const handleChangeEType = (value: string) => {
-        dataElementType.forEach((item) => {
-            if (value === item.name_elementType) {
-                const newOptions = item.props.map((itemprops: any) => ({ value: itemprops.name }));
+
+    const handleChangeEType = (value: any) => {
+        setSelectedElementTypeId(value);
+    };
+
+    useEffect(() => {
+        if (selectedElementTypeId !== null) {
+            const selectedElementType = dataElementType.find((item) => item.id === selectedElementTypeId);
+            if (selectedElementType) {
+                const newOptions = selectedElementType.props.map((itemprops: any) => ({
+                    value: itemprops.id,
+                    label: itemprops.name,
+                }));
                 setOptions(newOptions);
-                setCheckedProps(item.props);
+                setCheckedProps(selectedElementType.props);
+            } else {
+                setOptions([]);
+                setCheckedProps([]);
             }
-        });
-    };
+        }
+    }, [selectedElementTypeId, dataElementType]);
+
 
     const HandleEditCreateNodes = async (value: any) => {
 
@@ -309,12 +317,13 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                     {...field}
                                                     name={[field.name, 'elementType']}
                                                     label="Element Type"
-                                                    rules={[{ required: true, message: 'Please select the element type!' }]}
                                                 >
-                                                    <Select onChange={handleChangeEType}>
-                                                        {dataElementType.map((item) => (
-                                                            <Select.Option key={item.id} value={item.name_elementType}>{item.name_elementType}</Select.Option>
-                                                        ))}
+                                                    <Select onChange={handleChangeEType}
+                                                        options={dataElementType?.map((item => ({
+                                                            value: item.id,
+                                                            label: item.name_elementType
+                                                        })))} >
+
                                                     </Select>
                                                 </Form.Item>
                                                 <label>Props:</label>
@@ -356,8 +365,16 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                                             options={options}
                                                                             placeholder="Prop Name"
                                                                             filterOption={(inputValue, option) =>
-                                                                                option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                                                option!.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                                                             }
+                                                                            onSelect={(value, option) => {
+                                                                                form.setFieldsValue({
+                                                                                    [nestedField.name]: {
+                                                                                        propName: option.label,
+                                                                                    },
+                                                                                });
+                                                                            }}
+                                                                            fieldNames={{ value: 'label' }}
                                                                         />
                                                                     </Form.Item>
                                                                     <Form.Item

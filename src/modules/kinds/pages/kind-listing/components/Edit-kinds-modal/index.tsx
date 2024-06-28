@@ -1,86 +1,92 @@
-import { useEffect,useState } from 'react';
-import ReactJson from 'react-json-view';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import databaseService from 'databaseService';
 
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, message,Modal, Select } from 'antd';
-import { useForm } from 'antd/es/form/Form';
-
-import databaseService from '../../../../../../databaseService';
-
+import { EditOutlined } from '@ant-design/icons';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { Button, Form, Input, message, Modal } from 'antd';
 
 
+const supabaseUrl = 'https://ismbrwqkcootieaguzwa.supabase.co';
+const supabaseAPIKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzbWJyd3FrY29vdGllYWd1endhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NTQyNDcsImV4cCI6MjAyODEzMDI0N30.fEo-ddluC6l2HNPqIjcHBFHTYdIWoE8vjfjIX9KPbPI';
+const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAPIKey);
 
-export default function ModalEditKind(e:any) {
-    const [form] = useForm();
+const ModalEditKind = ({ id, name_kind }: { id: string, name_kind: string }) => {
+    const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
+    const [kind, setKind] = useState<string>(name_kind);
 
-    const [kind, setKind] = useState<any>();
-
-    const handleChangeKind = (value: React.ChangeEvent<HTMLInputElement>) => {
-        setKind(value.target.value);
-    }
-
-    const EditKind = async () => {
-        if( kind !== '' ) {
-            if(true) {
-                message.success('Sửa thành công!');
-                window.location.href = '/kinds';
-            }else {
-                message.error('Sửa thất bại!');
-            }
-        }else {
-            message.error('Vui lòng nhập tên Kind!');
+    const handleSubmit = async () => {
+        if (!id) {
+            message.error('Không tìm thấy ID để cập nhật.');
+            
+return;
         }
-    }
+        if(!kind)
+            {
+                message.error('Vui lòng nhập tên kind');
+                
+return;
+            }
+        try {
+            await databaseService.updateKind(id, kind);
+            message.success('Cập nhật thành công!');
+            setKind(name_kind);
+            setOpen(false);
+        } catch (error) {
+            message.error(`Cập nhật thất bại! Lỗi: ${error}`);
+            console.error(error);
+        }
+    };
+    const handleCancel = () => {
+        setKind(name_kind);
+        setOpen(false);
+    };
+    const handleChangeKind = (e:any) => {
+        setKind(e.target.value);
+    };
     
-    const fetchData = async () => {
-        console.log(e.name_kind);
-    }
-
-    return (
+return (
         <>
-            <Button type="primary" className='mr-1' icon={<EditOutlined />} onClick={() => {setOpen(true);fetchData()}}></Button>
+            <Button
+                type="primary"
+                className='mr-1'
+                icon={<EditOutlined />}
+                onClick={() => setOpen(true)}
+            >
+            </Button>
             <Modal
                 open={open}
                 afterClose={() => form.resetFields()}
-                title={'Edit name kind instance'}
+                title="Chỉnh sửa tên loại"
                 destroyOnClose
-                onCancel={() => setOpen(false)}
-                onOk={() => EditKind()}
-            
+                onCancel={handleCancel}
+                onOk={handleSubmit}
+                afterOpenChange={()=>form.resetFields()}
             >
-                <Form form={form}
+                <Form
+                    form={form}
                     layout="vertical"
-                    labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 18 }}
-                    name="dynamic_form_complex"
-                    style={{ maxWidth: 1200 }}
+                    initialValues={{  kind:name_kind }}
+                    name="edit_kind_form"
+                    style={{ maxWidth: 600 }}
                     autoComplete="off"
-                    initialValues={{ node: [{}] }}
-                >  
-                    <Form.List name="node">
-                        {(fields, { add, remove }) => (
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                {fields.map((field) => (
-                                    <Card
-                                        size="small"
-                                        key={field.key}
-                                    >
-                                        <Form.Item label="Name">
-                                            <Input 
-                                                onChange={handleChangeKind}
-                                                value={e.name_kind}
-                                            />
-                                        </Form.Item>
-                                    </Card>
-
-                                ))}
-                            </div>
-                        )}
-                    </Form.List>
-
+                >
+                    <Form.Item
+                        label="Tên"
+                        name="kind"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên kind!' }]}
+                    >
+                        <Input
+                            onChange={handleChangeKind}
+                            value={kind}
+                        />
+                    </Form.Item>
                 </Form>
             </Modal>
         </>
     );
 };
+
+
+export default ModalEditKind;

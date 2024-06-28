@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ROUTE_PATHS } from 'constants-es';
+import databaseService from 'databaseService';
 
-import { EditOutlined } from '@ant-design/icons';
-import { Button, Popover } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, message, Popconfirm, Popover } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { BsThreeDots } from 'react-icons/bs';
+
+import { dataCommandModal } from 'components/common/react-flows/components/nodes/data';
 
 import ButtonDelete from './components/button-delete';
 import ExportData from './components/modal-preview-export-data';
@@ -32,9 +35,16 @@ export const getTableColumnsConfig = ({ isSmallScreen }: GetTableColumnsConfigPr
             title: 'Actions',
             dataIndex: 'actions',
             key: 'actions',
-            width: 100,
+            width: 220,
 
             render: (_: any, record: any) => {
+                async function handleDelete(id: any) {
+                    if (await databaseService.deleteWorkflow(id)) {
+                        message.success('Success!');
+                        setTimeout(() => { window.location.href = '/work-flows'; }, 1000)
+                    }
+                }
+
                 return isSmallScreen ? (
                     <Popover
                         content={

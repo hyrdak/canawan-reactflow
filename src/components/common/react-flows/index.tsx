@@ -67,6 +67,7 @@ export const ContentDnDFlow = ({ data, onChange }: Props) => {
         visible: false,
         data: null
     });
+    console.log(nodes);
 
     const onConnect = useCallback(
         (params: any) => {
@@ -177,13 +178,13 @@ export const ContentDnDFlow = ({ data, onChange }: Props) => {
                 style:
                     command === CommandNode.Stop
                         ? {
-                              width: '60px',
-                              height: '60px',
-                              backgroundColor: '#d03a52',
-                              color: '#fff',
-                              boxShadow: 'rgb(208 58 82 / 38%) 0px 0px 12px',
-                              borderRadius: '50%'
-                          }
+                            width: '60px',
+                            height: '60px',
+                            backgroundColor: '#d03a52',
+                            color: '#fff',
+                            boxShadow: 'rgb(208 58 82 / 38%) 0px 0px 12px',
+                            borderRadius: '50%'
+                        }
                         : {}
             };
 

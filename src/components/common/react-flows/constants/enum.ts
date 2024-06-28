@@ -1,5 +1,6 @@
 import React from 'react';
 import { MarkerType } from 'reactflow';
+import databaseService from 'databaseService';
 
 import { LuMousePointerClick } from 'react-icons/lu';
 
@@ -33,7 +34,7 @@ export enum TypeOther {
 
 
 
-export enum TypeNodes { 
+export enum TypeNodes {
     StartNode = 'input',
     EndNode = 'output',
     StopNode = 'stopNode',
@@ -43,7 +44,7 @@ export enum TypeNodes {
     HelpNode = 'helper',
 }
 
-export enum TypeEdges { 
+export enum TypeEdges {
     ButtonEdge = 'buttonEdge',
     TextEdge = 'textEdge',
     SuccessEdge = 'successEdge',
@@ -59,8 +60,8 @@ export enum DefaultId {
 }
 
 export const MARKER_TYPE: {
-    [x:string] : any
-} =  { 
+    [x: string]: any
+} = {
     [TypeEdges.SuccessEdge]: {
         type: MarkerType.ArrowClosed,
         color: "#52c41a",
@@ -85,32 +86,32 @@ export const MARKER_TYPE: {
     },
 }
 
-export enum CommandNode  {
-   Start =  'start',
-   Stop =  'stop',
-   NewTab =  'newTab',
-   Variables =  'variables',
-   Click =  'click',
-   OpenUrl = 'openUrl',
-   Scroll = 'scroll',
-   Random = 'random',
-   MouseMovement = 'mouseMovement',
-   If = 'if',
-   Sleep='delay',
-   Loop = "loop",
-   ReloadPage = "reloadPage",
-   UploadFile  = "fileUpload",
-   ElementExists = "elementExists",
-   TypeText = "typeText",
-   PressKey = "pressKey",
-   GetUrl = "getUrl",
-   Spreadsheet = "spreadsheet",
-   Javascript= "javascript",
-   Fetch =  "fetch",
-   SetVariables =  'setVariables',
-   Custom = "custom",
-} 
-export const COMMAND_NODE_LABELS  = {
+export enum CommandNode {
+    Start = 'start',
+    Stop = 'stop',
+    NewTab = 'newTab',
+    Variables = 'variables',
+    Click = 'click',
+    OpenUrl = 'openUrl',
+    Scroll = 'scroll',
+    Random = 'random',
+    MouseMovement = 'mouseMovement',
+    If = 'if',
+    Sleep = 'delay',
+    Loop = "loop",
+    ReloadPage = "reloadPage",
+    UploadFile = "fileUpload",
+    ElementExists = "elementExists",
+    TypeText = "typeText",
+    PressKey = "pressKey",
+    GetUrl = "getUrl",
+    Spreadsheet = "spreadsheet",
+    Javascript = "javascript",
+    Fetch = "fetch",
+    SetVariables = 'setVariables',
+    Custom = "custom",
+}
+export const COMMAND_NODE_LABELS = {
     [CommandNode.Start]: 'Start',
     [CommandNode.Stop]: 'Stop',
     [CommandNode.NewTab]: 'New Tab',
@@ -121,22 +122,24 @@ export const COMMAND_NODE_LABELS  = {
     [CommandNode.Random]: 'Random',
     [CommandNode.MouseMovement]: 'Mouse Movement',
     [CommandNode.If]: 'If',
-    [CommandNode.Sleep] : 'Sleep',
-    [CommandNode.Loop] : 'Loop',
-    [CommandNode.ReloadPage] : 'Reload Page',
-    [CommandNode.UploadFile] : 'Upload File',
-    [CommandNode.ElementExists] : 'Element Exists',
-    [CommandNode.TypeText] : 'Type Text',
-    [CommandNode.PressKey] : 'Press Key',
-    [CommandNode.GetUrl] : 'Get Url',
-    [CommandNode.Spreadsheet] : 'Spreadsheet',
+    [CommandNode.Sleep]: 'Sleep',
+    [CommandNode.Loop]: 'Loop',
+    [CommandNode.ReloadPage]: 'Reload Page',
+    [CommandNode.UploadFile]: 'Upload File',
+    [CommandNode.ElementExists]: 'Element Exists',
+    [CommandNode.TypeText]: 'Type Text',
+    [CommandNode.PressKey]: 'Press Key',
+    [CommandNode.GetUrl]: 'Get Url',
+    [CommandNode.Spreadsheet]: 'Spreadsheet',
     [CommandNode.Javascript]: 'Javascript',
     [CommandNode.Fetch]: 'HTTP Request',
-    [CommandNode.SetVariables]:'Set Variables',
+    [CommandNode.SetVariables]: 'Set Variables',
     [CommandNode.Custom]: 'Custom',
-    
-} 
-export const COMMAND_NODE_ICONS  = {
+
+}
+
+
+export const COMMAND_NODE_ICONS = {
     [CommandNode.Start]: 'AiOutlineFlag',
     [CommandNode.Stop]: 'AiOutlineStop',
     [CommandNode.NewTab]: '',
@@ -147,20 +150,20 @@ export const COMMAND_NODE_ICONS  = {
     [CommandNode.Random]: 'GiPerspectiveDiceSixFacesRandom',
     [CommandNode.MouseMovement]: 'LuMove',
     [CommandNode.If]: 'AiOutlineQuestionCircle',
-    [CommandNode.Sleep] : 'PiEyeClosedDuotone',
-    [CommandNode.Loop] : 'MdLoop',
-    [CommandNode.ReloadPage] : 'AiOutlineReload',
-    [CommandNode.UploadFile] : 'AiOutlineFile',
-    [CommandNode.ElementExists] : 'LiaElementor',
-    [CommandNode.TypeText] : 'PiTextT',
-    [CommandNode.PressKey] : 'FaRegKeyboard',
-    [CommandNode.GetUrl] : 'PiLinkLight',
-    [CommandNode.Spreadsheet] : 'LuFileSpreadsheet',
-    [CommandNode.Javascript] : 'FaCode',
+    [CommandNode.Sleep]: 'PiEyeClosedDuotone',
+    [CommandNode.Loop]: 'MdLoop',
+    [CommandNode.ReloadPage]: 'AiOutlineReload',
+    [CommandNode.UploadFile]: 'AiOutlineFile',
+    [CommandNode.ElementExists]: 'LiaElementor',
+    [CommandNode.TypeText]: 'PiTextT',
+    [CommandNode.PressKey]: 'FaRegKeyboard',
+    [CommandNode.GetUrl]: 'PiLinkLight',
+    [CommandNode.Spreadsheet]: 'LuFileSpreadsheet',
+    [CommandNode.Javascript]: 'FaCode',
     [CommandNode.Fetch]: 'PiPlugsConnectedThin',
-    [CommandNode.SetVariables]:"LuVariable",
+    [CommandNode.SetVariables]: "LuVariable",
     [CommandNode.Custom]: 'VscJson',
-} 
+}
 
 export enum KindNode {
     // Action = 'action',

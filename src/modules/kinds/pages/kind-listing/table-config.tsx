@@ -2,7 +2,7 @@ import ReactJson from 'react-json-view';
 import databaseService from 'databaseService';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, message,Popconfirm } from 'antd';
+import { Button, message,Pagination,Popconfirm } from 'antd';
 
 import ModalEditKind from './components/Edit-kinds-modal';
 
@@ -14,7 +14,7 @@ async function handleDelete(id: any) {
     if(await databaseService.deleteKind(id)) {
         message.success('Xóa thành công!');
         localStorage.setItem("flag_load", 'true');
-        window.location.href = '/kinds';
+        // window.location.href = '/kinds';
     }else {
         message.error('Xóa thất bại!');
     }
@@ -22,18 +22,10 @@ async function handleDelete(id: any) {
 export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
     const columnConfig: any[] = [
         {
-            title: '#',
-            key: 'id',
-            dataIndex: 'id',
-            width: 50,
-            align: 'center',
-            render: (_id: string, _record: any, index: number) => <span className="capitalize">{index + 1}</span>
-        },
-        {
             title: 'Kind',
             key: 'name_kind',
             dataIndex: 'name_kind',
-            width: 1000,
+            width: 500,
             render: (kind: string) => <span className="capitalize">{kind}</span>
         },
         {
@@ -42,7 +34,7 @@ export const getTableColumnsConfig = (props: GetTableColumnsConfigProps) => {
           width: 101,
           render: (text: string, record: any) => (
             <span>
-              <ModalEditKind name_kind={record.name_kind} />
+              <ModalEditKind id={record.id} name_kind={record.name_kind} />
               <Popconfirm
                 title="Are you sure to delete this type?"
                 onConfirm={() => handleDelete(record.id)}

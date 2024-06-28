@@ -1,115 +1,358 @@
-import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATHS } from 'constants-es';
-import { useAppDispatch } from 'libs/redux';
+// import React, { useEffect, useRef, useState } from 'react';
+// import { toast, ToastContainer } from 'react-toastify';
+// import { Link } from 'react-router-dom';
+// import { SupabaseClient } from '@supabase/supabase-js';
 
-import { Button, Form, Input, message } from 'antd';
+// interface Props {
+//   supabase: SupabaseClient;
+// }
 
-import { setAuth } from 'helpers/auth';
-import { setAuthUser } from 'data/store';
-import { useMutationRequestLogin } from 'modules/auth/data/queries';
+// const SignIn: React.FC<Props> = ({ supabase }) => {
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [loading, setLoading] = useState<boolean>(false);
+//   const emailInputRef = useRef<HTMLInputElement>(null);
+//   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
+ 
 
-const SignIn = () => {
-    const mutationRequestLogin = useMutationRequestLogin();
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
 
-    const handleFinish = ({ email, password }: any) => {
-        mutationRequestLogin.mutate(
-            { email, password },
-            {
-                onSuccess: (response) => {
-                    if (response.status === 200) {
-                        message.success(response.message);
-                        dispatch(
-                            setAuthUser({
-                                user: response.data.user,
-                                accessToken: response.data.accessToken,
-                                refreshToken: response.data.refreshToken
-                            })
-                        );
-                        // navigate(ROUTE_PATHS.WORK_FLOWS);
-                    } else {
-                        message.error(response.message);
-                    }
-                },
-                onError: (error: any) => {
-                    message.error(error.message);
-                }
-            }
-        );
-    };
+//   useEffect(() => {
+//     if (emailInputRef.current) {
+//       emailInputRef.current.focus();
+//     }
+//   }, []);
 
-    return (
-        <div className="flex items-center justify-center h-screen">
-            <div className="flex-col px-6 bg-white border rounded shadow-md min-w-fit py-14">
-                <div className="flex justify-center mb-8">
-                    <img className="w-24" src="/logo200x200.png" alt="" />
-                </div>
-                <Form className="flex flex-col text-sm rounded-md" onFinish={handleFinish}>
-                    <Form.Item
-                        name={'email'}
-                        rules={[
-                            {
-                                required: true,
-                                whitespace: true,
-                                message: 'Please input your email!'
-                            }
-                        ]}
-                    >
-                        <Input size="large" type="Email" placeholder="Email" />
-                    </Form.Item>
-                    <Form.Item
-                        name={'password'}
-                        rules={[
-                            {
-                                required: true,
-                                whitespace: true,
-                                message: 'Please input your password!'
-                            }
-                        ]}
-                    >
-                        <Input size="large" type="password" placeholder="Password" />
-                    </Form.Item>
+//   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     setEmail(event.target.value);
+//   };
 
-                    <Button
-                        loading={mutationRequestLogin.isPending}
-                        type="primary"
-                        className="w-full p-2 mt-5 "
-                        htmlType="submit"
-                        size="large"
-                    >
-                        Sign in
-                    </Button>
-                </Form>
-                <div className="flex justify-between mt-5 text-sm text-gray-600">
-                    <a href={ROUTE_PATHS.FORGOT_PASSWORD}>Forgot password?</a>
-                    <a href={ROUTE_PATHS.SIGN_UP}>Sign up</a>
-                </div>
-                <div className="flex justify-center mt-5 text-sm">
-                    <p className="text-gray-400">or you can sign with</p>
-                </div>
-                <div className="flex justify-center gap-3 mt-3 ">
-                    <img
-                        src="/microsoft.png"
-                        className="duration-300 scale-105 cursor-pointer h-7 grayscale hover:grayscale-0"
-                    />
-                </div>
-                <div className="flex mt-5 text-sm text-center text-gray-400">
-                    <p>
-                        This site is protected by reCAPTCHA and the Google <br />
-                        <a className="underline" href="">
-                            Privacy Policy
-                        </a>{' '}
-                        and{' '}
-                        <a className="underline" href="">
-                            Terms of Service
-                        </a>{' '}
-                        apply.
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
+//   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     setPassword(event.target.value);
+//   };
+
+//   const signin_action = async () => {
+//     if (!email && !password) {
+//       toast.error('Vui lòng nhập email và mật khẩu');
+//       return;
+//     }
+//     if (!email) {
+//       toast.error('Vui lòng nhập email');
+//       return;
+//     }
+//     if (!password) {
+//       toast.error('Vui lòng nhập mật khẩu');
+//       return;
+//     }
+
+//     // Validate email format
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(email)) {
+//       toast.error('Email không đúng định dạng');
+//       return;
+//     }
+//     if (password.length < 6) {
+//       toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+//       return;
+//     }
+//     if (!emailRegex.test(email) && password.length < 6) {
+//       toast.error('Vui lòng nhập đúng định dạng email và mật khẩu');
+//       return;
+//     }
+
+//     setLoading(true); // Bắt đầu quá trình đăng nhập
+
+//     try {
+//       const { error } = await supabase.auth.signInWithPassword({
+//         email: email,
+//         password: password,
+//       });
+    
+//       if (error) {
+//         console.error('Error:', error.message);
+//         toast.error('Tên đăng nhập hoặc mật khẩu không đúng.');
+//       } else {
+//         toast.success('Đăng nhập thành công!');
+//         window.location.href = '/nodes';
+//       }
+//     } catch (error) {
+//       console.error('Error:', (error as Error).message);
+//       toast.error('Đã xảy ra lỗi trong quá trình đăng nhập.');
+//     } finally {
+//       setLoading(false); // Kết thúc quá trình đăng nhập, đặt trạng thái loading thành false
+//     }
+//     setLoading(true); // Bắt đầu quá trình đăng nhập
+
+// try {
+//   const { error } = await supabase.auth.signInWithPassword({
+//     email: email,
+//     password: password,
+//   });
+
+//   if (error) {
+//     console.error('Error:', error.message);
+//     toast.error('Tên đăng nhập hoặc mật khẩu không đúng.');
+//   } else {
+//     toast.success('Đăng nhập thành công!');
+//     window.location.href = '/nodes';
+//   }
+// } catch (error) {
+//   console.error('Error:', (error as Error).message);
+//   toast.error('Đã xảy ra lỗi trong quá trình đăng nhập.');
+// } finally {
+//   setLoading(false); // Kết thúc quá trình đăng nhập, đặt trạng thái loading thành false
+// }
+//   };
+//   return (
+//     <div className="absolute inset-0 bg-gradient-to-tl from-purple-600 to-cyan-400 flex items-center justify-center">
+//       <ToastContainer
+//         position="top-center"
+//         autoClose={5000}
+//         hideProgressBar={false}
+//         newestOnTop={false}
+//         closeOnClick
+//         rtl={false}
+//         pauseOnFocusLoss
+//         draggable
+//         pauseOnHover
+//       />
+//       <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-md dark:border dark:border-gray-700 p-6 space-y-4">
+//         <h1 className="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+//           Đăng nhập
+//         </h1>
+//         <form className="space-y-4" action="#" onSubmit={(e) => { e.preventDefault(); signin_action(); }}>
+//           <div>
+//             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+//             <input
+//               className="bg-gray-700 border border-gray-600 text-gray-300 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+//               id="email"
+//               type="email"
+//               placeholder="Nhập địa chỉ email"
+//               value={email}
+//               onChange={handleEmailChange}
+//               required
+//             />
+//           </div>
+//           <div>
+//             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="password">Mật khẩu</label>
+//             <input
+//               className="bg-gray-700 border border-gray-600 text-gray-300 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+//               id="password"
+//               type="password"
+//               placeholder="Vui lòng nhập mật khẩu"
+//               value={password}
+//               onChange={handlePasswordChange}
+//             />
+//           </div>
+//           <button
+//             onClick={signin_action}
+//             className="bg-gradient-to-l from-purple-600 to-cyan-400  text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+//             type="button"
+//             disabled={loading}
+//           >
+//             {loading ?
+//               <div className='flex'>
+//                 <svg className="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+//                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+//                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+//                 </svg> &ensp; Đang đăng nhập
+//               </div> : 'Đăng nhập'}
+//           </button>
+//         </form>
+//         <p className="mt-4 text-center text-black-100"> Quên mật khấu
+//           <Link to="/forgot-password" className="text-blue-700"> Bấm vào đay</Link>
+//         </p>
+//         <p className="mt-4 text-center text-black-100"> Chưa có tài khoản?
+//           <Link to="/sign-up" className="text-blue-700"> Đăng ký ngay</Link>
+//         </p>
+//       </div>
+      
+     
+      
+//       <ToastContainer position="top-center" />
+//     </div>
+    
+//   );
+// };
+
+// export default SignIn;
+
+
+
+
+
+import React, { useEffect, useRef, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import { Link } from 'react-router-dom';
+
+import { SupabaseClient } from '@supabase/supabase-js';
+
+interface Props {
+  supabase: SupabaseClient;
+}
+
+const SignIn: React.FC<Props> = ({ supabase }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (emailInputRef.current) {
+      emailInputRef.current.focus();
+    }
+  }, []);
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+    if (event.target.value) {
+      setEmailError(false);
+    }
+  };
+
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    if (event.target.value) {
+      setPasswordError(false);
+    }
+  };
+
+  const validateInputs = (): boolean => {
+    let valid = true;
+
+    if (!email) {
+      setEmailError(true);
+      valid = false;
+    } else {
+      setEmailError(false);
+    }
+
+    if (!password) {
+      setPasswordError(true);
+      valid = false;
+    } else {
+      setPasswordError(false);
+    }
+
+    return valid;
+  };
+
+  const signin_action = async () => {
+    if (!validateInputs()) {
+      // toast.error('Vui lòng nhập đầy đủ email và mật khẩu');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Email không đúng định dạng');
+      setEmailError(true);
+      
+return;
+    }
+    if (password.length < 6) {
+      toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+      setPasswordError(true);
+      
+return;
+    }
+
+    setLoading(true);
+
+    try {
+      const {data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        console.error('Error:', error.message);
+        toast.error('Tên đăng nhập hoặc mật khẩu không đúng.');
+      } else {
+        toast.success('Đăng nhập thành công!');
+        localStorage.setItem('token', data.session?.access_token);
+        window.location.href = '/nodes';
+        console.log('Access token' , data.session?.access_token);
+      }
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+      toast.error('Đã xảy ra lỗi trong quá trình đăng nhập.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 bg-gradient-to-tl from-purple-600 to-cyan-400 flex items-center justify-center">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md dark:border dark:border-gray-700 p-6 space-y-4">
+        <h1 className="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+          Đăng nhập
+        </h1>
+        <form className="space-y-4" action="#" onSubmit={(e) => { e.preventDefault(); signin_action(); }}>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+            <input
+              className={`bg-white border ${emailError ? 'border-red-500' : 'border-gray-600'} text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+              id="email"
+              type="email"
+              placeholder="Nhập địa chỉ email"
+              value={email}
+              onChange={handleEmailChange}
+              ref={emailInputRef}
+              required
+            />
+            {emailError && <p className="text-red-500 text-xs mt-1">Vui lòng nhập email</p>}
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="password">Mật khẩu</label>
+            <input
+              className={`bg-white border ${passwordError ? 'border-red-500' : 'border-gray-600'} text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+              id="password"
+              type="password"
+              placeholder="Vui lòng nhập mật khẩu"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+            />
+            {passwordError && <p className="text-red-500 text-xs mt-1">Vui lòng nhập mật khẩu</p>}
+          </div>
+          <button
+            onClick={signin_action}
+            className="bg-gradient-to-l from-purple-600 to-cyan-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            type="button"
+            disabled={loading}
+          >
+            {loading ?
+              <div className='flex'>
+                <svg className="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg> &ensp; Đang đăng nhập
+              </div> : 'Đăng nhập'}
+          </button>
+        </form>
+        <p className="mt-4 text-center text-black-100"> Quên mật khẩu?
+          <Link to="/forgot-password" className="text-blue-700"> Bấm vào đây</Link>
+        </p>
+        <p className="mt-4 text-center text-black-100"> Chưa có tài khoản?
+          <Link to="/sign-up" className="text-blue-700"> Đăng ký ngay</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default SignIn;

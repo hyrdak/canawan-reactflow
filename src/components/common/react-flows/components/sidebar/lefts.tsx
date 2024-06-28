@@ -34,7 +34,7 @@ export const LeftSidebar = ({ nodes, edges }: any) => {
     const [searchValue, setSearchValue] = useState('');
     const [collapse, setCollapse] = useState(false);
     const [dataNode, setDataNode] = useState<DataNode[]>([]);
-    const onDragStart = (event: any, data: DataNode) => {
+    const onDragStart = (event: any, data: CommandNode) => {
         event.dataTransfer.setData('application/reactflow', data);
         event.dataTransfer.effectAllowed = 'move';
     };
@@ -47,7 +47,6 @@ export const LeftSidebar = ({ nodes, edges }: any) => {
         };
         fetchData();
     }, []);
-
 
     return (
         <aside className="relative rounded-s left-sidebar">
@@ -91,13 +90,9 @@ export const LeftSidebar = ({ nodes, edges }: any) => {
 
                 >
                     <Flex vertical gap="small" style={{ width: '100%' }}>
-                        {dataNode.map((item: DataNode) => (
+                        {dataNode.map((item) => (
 
-                            <Button
-                                block
-                                onDragStart={(event: any) => onDragStart(event, item)}
-                                draggable
-                            >{item.name}</Button>
+                            <Button block>{item.name}</Button>
 
                         ))}
                     </Flex>

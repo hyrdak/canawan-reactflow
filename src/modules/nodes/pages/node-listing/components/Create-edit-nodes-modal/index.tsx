@@ -56,14 +56,13 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [dataKind, setDataKind] = useState<DataKind[]>([]);
     const [dataElementType, setDataElementType] = useState<DataElementType[]>([]);
-    const [selectedElementTypeId, setSelectedElementTypeId] = useState<number | null>(null);
+    const [selectedElementTypeId, setSelectedElementTypeId] = useState<string | null>(null);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
     const [checkedProps, setCheckedProps] = useState<any[]>([]);
 
     const queryClient = useQueryClient();
     const mutationCreateNode = useMutationCreateNode();
     const loading = mutationCreateNode.isPending;
-
     useEffect(() => {
         const fetchData = async () => {
             setDataType(await databaseService.getType());
@@ -74,49 +73,54 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
     }, []);
 
 
-    if (record) {
-        form.setFieldsValue({
-            name: record.name,
-            type: record.name_type,
-            kind: record.name_kind,
-            jsons: record.name_jsonoptions,
-            props: record.name_jsonoptions.map((item: any) => {
-                if (open && record.name_jsonoptions) {
-                    if (item.props[0] === undefined) {
+    useEffect(() => {
+        if (record) {
+            form.setFieldsValue({
+                name: record.name,
+                type: record.name_type,
+                kind: record.name_kind,
+                jsons: record.name_jsonoptions,
+                props: record.name_jsonoptions.map((item: any) => {
+                    if (open && item.props[0] === undefined) {
                         item.props = Object.entries(item.props).map(([propName, propValue]) => ({
                             propName,
-                            propValue: propValue
+                            propValue: propValue,
                         }));
                     }
-                }
-            })
-        });
-    }
+                }),
+            });
+        }
+    }, [record, open, form]);
 
     const afterClose = () => {
         if (!record) {
             form.resetFields();
+            setCheckedProps([])
+        }
+        else {
+            setCheckedProps([])
         }
 
     };
 
     const handleChangeEType = (value: any) => {
         setSelectedElementTypeId(value);
+        console.log(value);
+
     };
 
     useEffect(() => {
         if (selectedElementTypeId !== null) {
-            const selectedElementType = dataElementType.find((item) => item.id === selectedElementTypeId);
+            const selectedElementType = dataElementType.find((item) => item.name_elementType === selectedElementTypeId);
+
             if (selectedElementType) {
                 const newOptions = selectedElementType.props.map((itemprops: any) => ({
-                    value: itemprops.id,
+                    value: itemprops.name,
                     label: itemprops.name,
                 }));
+
                 setOptions(newOptions);
                 setCheckedProps(selectedElementType.props);
-            } else {
-                setOptions([]);
-                setCheckedProps([]);
             }
         }
     }, [selectedElementTypeId, dataElementType]);
@@ -317,12 +321,18 @@ const ModalCreateNode: React.FC<ModalEditNodeProps> = ({ record }) => {
                                                     {...field}
                                                     name={[field.name, 'elementType']}
                                                     label="Element Type"
+
                                                 >
                                                     <Select onChange={handleChangeEType}
+                                                        showSearch
                                                         options={dataElementType?.map((item => ({
-                                                            value: item.id,
+                                                            value: item.name_elementType,
                                                             label: item.name_elementType
-                                                        })))} >
+                                                        })))}
+                                                        filterOption={(inputValue, option) =>
+                                                            option!.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                                        }
+                                                    >
 
                                                     </Select>
                                                 </Form.Item>

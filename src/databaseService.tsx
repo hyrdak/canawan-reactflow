@@ -22,7 +22,6 @@ const databaseService = {
   //table
   async getNodes() {
     try {
-      console.log("Khởi chạy getNodes");
       const response = await axiosInstance.get('Nodes');
 
       return response.data;
@@ -33,7 +32,6 @@ const databaseService = {
   },
   async getType() {
     try {
-      console.log("Khởi chạy getType");
       const response = await axiosInstance.get('/Type');
 
       return response.data;
@@ -44,7 +42,6 @@ const databaseService = {
   },
   async getKind() {
     try {
-      console.log("Khởi chạy getKind");
       const response = await axiosInstance.get('/Kind');
 
       return response.data;
@@ -55,7 +52,6 @@ const databaseService = {
   },
   async getJsonOptions() {
     try {
-      console.log("Khởi chạy getJsonOptions");
       const response = await axiosInstance.get('/JsonOptions');
 
       return response.data;
@@ -66,7 +62,6 @@ const databaseService = {
   },
   async getWorkflows(isFetching: boolean = true) {
     try {
-      console.log("Khởi chạy getWorkflows");
       const response = await axiosInstance.get('/Workflows');
 
       return response.data;
@@ -292,7 +287,6 @@ const databaseService = {
   //getElementType
   async getElementType() {
     try {
-      console.log("Khởi chạy getElementType");
       const response = await axiosInstance.get('/ElementType');
 
       return response.data;
